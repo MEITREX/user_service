@@ -4,9 +4,9 @@ services:
     restart: always
     network_mode: bridge
     expose:
-      - 1032
+      - 5032
     ports:
-      - "1032:5432"
+      - "5032:5432"
     volumes:
       - userdata:/var/lib/postgresql/data
     environment:
@@ -33,11 +33,11 @@ services:
     network_mode: bridge
     container_name: user_service
     expose:
-      - 1000
-      - 1001
+      - 5000
+      - 5001
     ports:
-      - 1000:1000
-      - 1001:1001
+      - 5000:5000
+      - 5001:5001
     depends_on:
       - database-user
     links:
