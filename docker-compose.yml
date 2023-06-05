@@ -6,21 +6,21 @@ services:
     expose:
       - 1032
     ports:
-      - "1036:5432"
+      - "1032:5432"
     volumes:
       - templatedata:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=userService
-      - POSTGRES_PASSWORD=userService
-      - POSTGRES_DB=membershipdatabase
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=templatedatabase
   testDb:
     image: postgres:alpine
     restart: always
     network_mode: bridge
     expose:
-      - 1036
+      - 1033
     ports:
-      - "1037:5432"
+      - "1033:5432"
     volumes:
       - coursedata:/var/lib/postgresql/testdata
     environment:
@@ -43,6 +43,6 @@ services:
     links:
       - database
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/membershipdatabase
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/templatedatabase
 volumes:
-  userdata:
+  templatedata:
