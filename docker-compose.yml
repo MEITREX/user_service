@@ -1,48 +1,48 @@
 services:
-  database-user:
+  database:
     image: postgres:alpine
     restart: always
     network_mode: bridge
     expose:
-      - 5032
+      - 1032
     ports:
-      - "5032:5432"
+      - "1036:5432"
     volumes:
-      - userdata:/var/lib/postgresql/data
+      - templatedata:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=userdatabase
+      - POSTGRES_USER=userService
+      - POSTGRES_PASSWORD=userService
+      - POSTGRES_DB=membershipdatabase
   testDb:
     image: postgres:alpine
     restart: always
     network_mode: bridge
     expose:
-      - 1033
+      - 1036
     ports:
-      - "1033:5432"
+      - "1037:5432"
     volumes:
       - coursedata:/var/lib/postgresql/testdata
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=test_data
-  app-user:
+  app:
     build: .
     restart: always
     network_mode: bridge
-    container_name: user_service
+    container_name: template_microservice
     expose:
-      - 5000
-      - 5001
+      - 1000
+      - 1001
     ports:
-      - 5000:5000
-      - 5001:5001
+      - 1000:1000
+      - 1001:1001
     depends_on:
-      - database-user
+      - database
     links:
-      - database-user
+      - database
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://database-user:5432/userdatabase
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/membershipdatabase
 volumes:
   userdata:
