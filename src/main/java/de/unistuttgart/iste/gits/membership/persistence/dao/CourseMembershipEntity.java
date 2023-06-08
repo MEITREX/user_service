@@ -23,4 +23,8 @@ public class CourseMembershipEntity {
     @Id
     @Column(nullable = false)
     private UUID courseId;
+
+    @Column
+    private CourseRole courseRole;
+
 }

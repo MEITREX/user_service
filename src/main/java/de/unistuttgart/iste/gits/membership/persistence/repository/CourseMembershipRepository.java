@@ -11,6 +11,6 @@ import java.util.UUID;
 @Repository
 public interface CourseMembershipRepository extends JpaRepository<CourseMembershipEntity, CourseMembershipPk> {
 
-    List<CourseMembershipEntity> findCourseMembershipEntitiesByUserIdOOrderByCourseId(UUID userId);
+    List<CourseMembershipEntity> findCourseMembershipEntitiesByUserIdOrderByCourseId(UUID userId);
 
 }

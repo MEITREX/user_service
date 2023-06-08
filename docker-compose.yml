@@ -24,8 +24,8 @@ services:
     volumes:
       - coursedata:/var/lib/postgresql/testdata
     environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
+      - POSTGRES_USER=userService
+      - POSTGRES_PASSWORD=userService
       - POSTGRES_DB=test_data
   app:
     build: .

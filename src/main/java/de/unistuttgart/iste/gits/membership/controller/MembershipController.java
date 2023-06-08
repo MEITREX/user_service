@@ -8,6 +8,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -18,7 +19,7 @@ public class MembershipController {
     private final MembershipService membershipService;
 
     @QueryMapping
-    public CourseMembershipDto courseMemberships(@Argument(name="id") UUID userId) {
+    public List<CourseMembershipDto> courseMemberships(@Argument(name="id") UUID userId) {
 
         return membershipService.getAllMembershipsByUser(userId);
     }

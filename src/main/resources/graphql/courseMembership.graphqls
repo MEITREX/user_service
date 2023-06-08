@@ -10,7 +10,7 @@
  Represents a course membership object of a user. Each user can be a member of set of courses and some users can also own courses
 """
 type CourseMembership {
-  id: UUID!
-  courses: [UUID!]
-  ownedCourses: [UUID!]
+  userId: UUID!
+  courseId: UUID!
+  role: String!
 }
