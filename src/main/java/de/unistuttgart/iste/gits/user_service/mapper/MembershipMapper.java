@@ -1,6 +1,7 @@
 package de.unistuttgart.iste.gits.user_service.mapper;
 
 import de.unistuttgart.iste.gits.generated.dto.CourseMembershipDto;
+import de.unistuttgart.iste.gits.generated.dto.CourseMembershipInputDto;
 import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseMembershipEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -19,7 +20,7 @@ public class MembershipMapper {
 
     }
 
-    public CourseMembershipEntity dtoToEntity(CourseMembershipDto courseMembershipDto){
+    public CourseMembershipEntity dtoToEntity(CourseMembershipInputDto courseMembershipDto){
 
         return modelMapper.map(courseMembershipDto, CourseMembershipEntity.class);
     }

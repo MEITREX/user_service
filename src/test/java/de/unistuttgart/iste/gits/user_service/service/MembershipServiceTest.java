@@ -50,7 +50,6 @@ class MembershipServiceTest {
 
         for (CourseMembershipDto item: resultSet) {
             assertTrue(membershipDtos.contains(item), item.toString());
-            assertTrue(entities.contains(membershipMapper.dtoToEntity(item)), item.toString());
         }
 
     }

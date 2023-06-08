@@ -14,3 +14,12 @@ type CourseMembership {
   courseId: UUID!
   role: String!
 }
+
+"""
+Represents a course membership input object of a user.
+"""
+input CourseMembershipInput {
+    userId: UUID!
+    courseId: UUID!
+    role: String!
+}
