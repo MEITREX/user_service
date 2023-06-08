@@ -8,7 +8,7 @@ services:
     ports:
       - "1036:5432"
     volumes:
-      - templatedata:/var/lib/postgresql/data
+      - userdata:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=userService
       - POSTGRES_PASSWORD=userService
@@ -18,11 +18,11 @@ services:
     restart: always
     network_mode: bridge
     expose:
-      - 1036
+      - 1037
     ports:
       - "1037:5432"
     volumes:
-      - coursedata:/var/lib/postgresql/testdata
+      - userdata:/var/lib/postgresql/testdata
     environment:
       - POSTGRES_USER=userService
       - POSTGRES_PASSWORD=userService
@@ -31,7 +31,7 @@ services:
     build: .
     restart: always
     network_mode: bridge
-    container_name: template_microservice
+    container_name: user_microservice
     expose:
       - 1000
       - 1001
