@@ -8,9 +8,17 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Repository for {@link CourseMembershipEntity}
+ */
 @Repository
 public interface CourseMembershipRepository extends JpaRepository<CourseMembershipEntity, CourseMembershipPk> {
 
+    /**
+     * Hibernate Query. Find Entities by User ID. ORDERED BY Course ID
+     * @param userId User ID
+     * @return List of Entities
+     */
     List<CourseMembershipEntity> findCourseMembershipEntitiesByUserIdOrderByCourseId(UUID userId);
 
 }
