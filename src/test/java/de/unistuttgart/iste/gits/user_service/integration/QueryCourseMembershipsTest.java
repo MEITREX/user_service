@@ -1,0 +1,71 @@
+package de.unistuttgart.iste.gits.user_service.integration;
+
+import de.unistuttgart.iste.gits.generated.dto.CourseMembershipDto;
+import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseMembershipEntity;
+import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseRole;
+import de.unistuttgart.iste.gits.user_service.persistence.repository.CourseMembershipRepository;
+import de.unistuttgart.iste.gits.util.GraphQlApiTest;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.graphql.test.tester.GraphQlTester;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@GraphQlApiTest
+public class QueryCourseMembershipsTest {
+
+    @Autowired
+    private CourseMembershipRepository membershipRepository;
+
+    @Test
+    void testNoMembershipExisting(GraphQlTester tester){
+        //GraphQL query
+        String query = """
+                query {
+                    courseMemberships(id: "%s") {
+                        userId
+                        courseId
+                        role
+                    }
+                }
+                """.formatted(UUID.randomUUID());
+        tester.document(query)
+                .execute()
+                .path("courseMemberships")
+                .entityList(CourseMembershipDto.class)
+                .hasSize(0);
+    }
+
+    @Test
+    void testMembership(GraphQlTester tester){
+
+        UUID userId = UUID.randomUUID();
+        List<CourseMembershipDto> DTOList = new ArrayList<>();
+
+        for (int i = 0; i < 2; i++) {
+            UUID courseId = UUID.randomUUID();
+            CourseMembershipEntity entity = CourseMembershipEntity.builder().userId(userId).courseId(courseId).courseRole(CourseRole.STUDENT).build();
+            CourseMembershipDto dto = CourseMembershipDto.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build();
+            membershipRepository.save(entity);
+            DTOList.add(dto);
+        }
+        //GraphQL query
+        String query = """
+                query {
+                    courseMemberships(id: "%s") {
+                        userId
+                        courseId
+                        role
+                    }
+                }
+                """.formatted(userId);
+        tester.document(query)
+                .execute()
+                .path("courseMemberships")
+                .entityList(CourseMembershipDto.class)
+                .hasSize(2)
+                .contains(DTOList.get(0), DTOList.get(1));
+    }
+}

@@ -1,0 +1,6 @@
+type Query {
+    """
+    query to retrieve a list of course memberships for a user ID
+    """
+    courseMemberships(id: UUID!): [CourseMembership!]
+}
