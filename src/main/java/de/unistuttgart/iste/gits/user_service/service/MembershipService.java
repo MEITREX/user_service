@@ -1,9 +1,9 @@
-package de.unistuttgart.iste.gits.membership.service;
+package de.unistuttgart.iste.gits.user_service.service;
 
 import de.unistuttgart.iste.gits.generated.dto.CourseMembershipDto;
-import de.unistuttgart.iste.gits.membership.mapper.MembershipMapper;
-import de.unistuttgart.iste.gits.membership.persistence.dao.CourseMembershipEntity;
-import de.unistuttgart.iste.gits.membership.persistence.repository.CourseMembershipRepository;
+import de.unistuttgart.iste.gits.user_service.mapper.MembershipMapper;
+import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseMembershipEntity;
+import de.unistuttgart.iste.gits.user_service.persistence.repository.CourseMembershipRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

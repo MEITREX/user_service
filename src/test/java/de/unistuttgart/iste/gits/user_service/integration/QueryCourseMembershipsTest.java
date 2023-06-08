@@ -1,7 +1,7 @@
-package de.unistuttgart.iste.gits.membership.integration;
+package de.unistuttgart.iste.gits.user_service.integration;
 
 import de.unistuttgart.iste.gits.generated.dto.CourseMembershipDto;
-import de.unistuttgart.iste.gits.membership.persistence.repository.CourseMembershipRepository;
+import de.unistuttgart.iste.gits.user_service.persistence.repository.CourseMembershipRepository;
 import de.unistuttgart.iste.gits.util.GraphQlApiTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

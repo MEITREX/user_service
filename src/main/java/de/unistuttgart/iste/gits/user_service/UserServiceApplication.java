@@ -1,4 +1,4 @@
-package de.unistuttgart.iste.gits.membership;
+package de.unistuttgart.iste.gits.user_service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;

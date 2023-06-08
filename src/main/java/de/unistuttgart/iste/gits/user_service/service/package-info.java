@@ -2,4 +2,4 @@
  * The service classes implement the actual business logic. This usually includes the interaction with the
  * repositories and the mapping of the entities to DTOs.
  */
-package de.unistuttgart.iste.gits.membership.service;
+package de.unistuttgart.iste.gits.user_service.service;

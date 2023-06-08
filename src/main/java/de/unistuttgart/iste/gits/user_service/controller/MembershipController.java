@@ -1,7 +1,7 @@
-package de.unistuttgart.iste.gits.membership.controller;
+package de.unistuttgart.iste.gits.user_service.controller;
 
 import de.unistuttgart.iste.gits.generated.dto.CourseMembershipDto;
-import de.unistuttgart.iste.gits.membership.service.MembershipService;
+import de.unistuttgart.iste.gits.user_service.service.MembershipService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;

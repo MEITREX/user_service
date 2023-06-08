@@ -1,4 +1,4 @@
-package de.unistuttgart.iste.gits.membership.config;
+package de.unistuttgart.iste.gits.user_service.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

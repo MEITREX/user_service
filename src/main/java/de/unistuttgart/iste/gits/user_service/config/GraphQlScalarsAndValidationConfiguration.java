@@ -1,4 +1,4 @@
-package de.unistuttgart.iste.gits.membership.config;
+package de.unistuttgart.iste.gits.user_service.config;
 
 import graphql.scalars.ExtendedScalars;
 import graphql.validation.rules.OnValidationErrorStrategy;
