@@ -1,48 +1,73 @@
+version: "3"
+
 services:
-  database:
+  database-user:
     image: postgres:alpine
     restart: always
-    network_mode: bridge
     expose:
-      - 1032
+      - 5032
     ports:
-      - "1036:5432"
+      - "5032:5432"
     volumes:
       - userdata:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=userService
-      - POSTGRES_PASSWORD=userService
-      - POSTGRES_DB=membershipdatabase
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=user_service
   testDb:
     image: postgres:alpine
     restart: always
-    network_mode: bridge
     expose:
-      - 1037
+      - 1033
     ports:
-      - "1037:5432"
+      - "1033:5432"
     volumes:
-      - userdata:/var/lib/postgresql/testdata
+      - testdata:/var/lib/postgresql/testdata
     environment:
-      - POSTGRES_USER=userService
-      - POSTGRES_PASSWORD=userService
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
       - POSTGRES_DB=test_data
-  app:
-    build: .
+  app-template:
+    build:
+      context: ./../user_service # necessary because otherwise docker-compose overrides the context path when merging multiple docker-compose.yml files
+      dockerfile: Dockerfile
     restart: always
-    network_mode: bridge
-    container_name: user_microservice
+    container_name: user_service
     expose:
-      - 1000
-      - 1001
+      - 5000
+      - 5001
     ports:
-      - 1000:1000
-      - 1001:1001
+      - "5000:5000"
+      - "5001:5001"
     depends_on:
-      - database
-    links:
-      - database
+      - database-user
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/membershipdatabase
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database-user:5432/user_service
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+  dapr-user:
+    image: "daprio/daprd"
+    command: [
+      "./daprd",
+      "--app-id", "user_service",
+      "--app-port", "5001",
+      "--dapr-http-port", "5000",
+      "--resources-path", "./components"
+    ]
+    volumes:
+      - "./components/:/components" # Mount our components folder for the runtime to use. The mounted location must match the --resources-path argument.
+    depends_on:
+      - app-user
+      - redis
+    network_mode: "service:app-user"
+  redis:
+    image: "redis:alpine"
+    expose:
+      - "6379"
 volumes:
   userdata:
+  testdata:
+networks:
+  default:
+    name: dapr-network
+    external: true
