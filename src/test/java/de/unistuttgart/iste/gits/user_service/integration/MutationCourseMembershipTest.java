@@ -1,6 +1,6 @@
 package de.unistuttgart.iste.gits.user_service.integration;
 
-import de.unistuttgart.iste.gits.generated.dto.CourseMembershipDto;
+import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
 import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseMembershipEntity;
 import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseRole;
 import de.unistuttgart.iste.gits.user_service.persistence.repository.CourseMembershipRepository;
@@ -20,7 +20,7 @@ public class MutationCourseMembershipTest {
     @Test
     void createMembershipTest(GraphQlTester tester){
 
-        CourseMembershipDto expectedDto = CourseMembershipDto.builder().setUserId(UUID.randomUUID()).setCourseId(UUID.randomUUID()).setRole(CourseRole.STUDENT.toString()).build();
+        CourseMembership expectedDto = CourseMembership.builder().setUserId(UUID.randomUUID()).setCourseId(UUID.randomUUID()).setRole(CourseRole.STUDENT.toString()).build();
 
         String query = """
                 mutation {
@@ -41,7 +41,7 @@ public class MutationCourseMembershipTest {
         tester.document(query)
                 .execute()
                 .path("createMembership")
-                .entity(CourseMembershipDto.class)
+                .entity(CourseMembership.class)
                 .isEqualTo(expectedDto);
     }
 
@@ -52,7 +52,7 @@ public class MutationCourseMembershipTest {
         UUID userId = UUID.randomUUID();
         UUID courseId = UUID.randomUUID();
 
-        CourseMembershipDto expectedDto = CourseMembershipDto.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build();
+        CourseMembership expectedDto = CourseMembership.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build();
 
         String query = """
                 mutation {
@@ -84,7 +84,7 @@ public class MutationCourseMembershipTest {
         UUID courseId = UUID.randomUUID();
 
         CourseMembershipEntity entity = CourseMembershipEntity.builder().userId(userId).courseId(courseId).courseRole(CourseRole.STUDENT).build();
-        CourseMembershipDto expectedDto = CourseMembershipDto.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build();
+        CourseMembership expectedDto = CourseMembership.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build();
 
         //create entity in DB
         courseMembershipRepository.save(entity);
@@ -108,7 +108,7 @@ public class MutationCourseMembershipTest {
         tester.document(query)
                 .execute()
                 .path("updateMembership")
-                .entity(CourseMembershipDto.class)
+                .entity(CourseMembership.class)
                 .isEqualTo(expectedDto);
     }
 
@@ -119,7 +119,7 @@ public class MutationCourseMembershipTest {
         UUID userId = UUID.randomUUID();
         UUID courseId = UUID.randomUUID();
 
-        CourseMembershipDto expectedDto = CourseMembershipDto.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build();
+        CourseMembership expectedDto = CourseMembership.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build();
 
 
         String query = """
@@ -152,7 +152,7 @@ public class MutationCourseMembershipTest {
         UUID courseId = UUID.randomUUID();
 
         CourseMembershipEntity entity = CourseMembershipEntity.builder().userId(userId).courseId(courseId).courseRole(CourseRole.STUDENT).build();
-        CourseMembershipDto expectedDto = CourseMembershipDto.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build();
+        CourseMembership expectedDto = CourseMembership.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build();
 
         //create entity in DB
         courseMembershipRepository.save(entity);
@@ -176,7 +176,7 @@ public class MutationCourseMembershipTest {
         tester.document(query)
                 .execute()
                 .path("deleteMembership")
-                .entity(CourseMembershipDto.class)
+                .entity(CourseMembership.class)
                 .isEqualTo(expectedDto);
     }
 

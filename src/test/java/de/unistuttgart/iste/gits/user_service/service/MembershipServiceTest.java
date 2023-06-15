@@ -1,6 +1,6 @@
 package de.unistuttgart.iste.gits.user_service.service;
 
-import de.unistuttgart.iste.gits.generated.dto.CourseMembershipDto;
+import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
 import de.unistuttgart.iste.gits.user_service.mapper.MembershipMapper;
 import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseMembershipEntity;
 import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseRole;
@@ -29,26 +29,26 @@ class MembershipServiceTest {
     void getAllMembershipsByUserTest() {
         // init data
         List<CourseMembershipEntity> entities = new ArrayList<>();
-        List<CourseMembershipDto> membershipDtos = new ArrayList<>();
+        List<CourseMembership> membershipDtos = new ArrayList<>();
         UUID userId = UUID.randomUUID();
 
         for (int i=0; i<3; i++){
             UUID courseId = UUID.randomUUID();
             entities.add(CourseMembershipEntity.builder().userId(userId).courseId(courseId).courseRole(CourseRole.STUDENT).build());
-            membershipDtos.add(CourseMembershipDto.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build());
+            membershipDtos.add(CourseMembership.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build());
         }
 
         //mock repository
         when(courseMembershipRepository.findCourseMembershipEntitiesByUserIdOrderByCourseId(userId)).thenReturn(entities);
 
         // run method under test
-        List<CourseMembershipDto> resultSet = membershipService.getAllMembershipsByUser(userId);
+        List<CourseMembership> resultSet = membershipService.getAllMembershipsByUser(userId);
 
 
         // compare results
         assertEquals(membershipDtos.size(), resultSet.size());
 
-        for (CourseMembershipDto item: resultSet) {
+        for (CourseMembership item: resultSet) {
             assertTrue(membershipDtos.contains(item), item.toString());
         }
 

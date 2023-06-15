@@ -1,8 +1,8 @@
 package de.unistuttgart.iste.gits.common.util;
 
-import de.unistuttgart.iste.gits.generated.dto.DateTimeFilterDto;
-import de.unistuttgart.iste.gits.generated.dto.IntFilterDto;
-import de.unistuttgart.iste.gits.generated.dto.StringFilterDto;
+import de.unistuttgart.iste.gits.generated.dto.DateTimeFilter;
+import de.unistuttgart.iste.gits.generated.dto.IntFilter;
+import de.unistuttgart.iste.gits.generated.dto.StringFilter;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
@@ -78,7 +78,7 @@ public class TestSpecificationUtil {
      */
     @Test
     public void testStringFilter() {
-        Specification<Object> specification = SpecificationUtil.stringFilter("test", StringFilterDto.builder()
+        Specification<Object> specification = SpecificationUtil.stringFilter("test", StringFilter.builder()
                 .setContains("testContains")
                 .setEquals("testEquals")
                 .build());
@@ -98,7 +98,7 @@ public class TestSpecificationUtil {
     public void testDateTimeFilter() {
         var after = LocalDate.of(2022, 1, 1).atStartOfDay().atOffset(ZoneOffset.UTC);
         var before = LocalDate.of(2023, 1, 1).atStartOfDay().atOffset(ZoneOffset.UTC);
-        Specification<Object> specification = SpecificationUtil.dateTimeFilter("test", DateTimeFilterDto.builder()
+        Specification<Object> specification = SpecificationUtil.dateTimeFilter("test", DateTimeFilter.builder()
                 .setAfter(after)
                 .setBefore(before)
                 .build());
@@ -131,7 +131,7 @@ public class TestSpecificationUtil {
     @Test
     public void testIntFilter() {
         Specification<Object> specification = SpecificationUtil.intFilter("test",
-                IntFilterDto.builder().setEquals(1).setGreaterThan(2).setLessThan(3).build());
+                IntFilter.builder().setEquals(1).setGreaterThan(2).setLessThan(3).build());
 
         specification.toPredicate(root, criteriaQuery, criteriaBuilder);
 

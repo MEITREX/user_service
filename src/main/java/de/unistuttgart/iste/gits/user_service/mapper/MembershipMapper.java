@@ -1,7 +1,7 @@
 package de.unistuttgart.iste.gits.user_service.mapper;
 
-import de.unistuttgart.iste.gits.generated.dto.CourseMembershipDto;
-import de.unistuttgart.iste.gits.generated.dto.CourseMembershipInputDto;
+import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
+import de.unistuttgart.iste.gits.generated.dto.CourseMembershipInput;
 import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseMembershipEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -14,14 +14,14 @@ public class MembershipMapper {
     private final ModelMapper modelMapper;
 
 
-    public CourseMembershipDto entityToDto(CourseMembershipEntity courseMembershipEntity){
+    public CourseMembership entityToDto(CourseMembershipEntity courseMembershipEntity){
 
-        return modelMapper.map(courseMembershipEntity, CourseMembershipDto.class);
+        return modelMapper.map(courseMembershipEntity, CourseMembership.class);
 
     }
 
-    public CourseMembershipEntity dtoToEntity(CourseMembershipInputDto courseMembershipDto){
+    public CourseMembershipEntity dtoToEntity(CourseMembershipInput CourseMembership){
 
-        return modelMapper.map(courseMembershipDto, CourseMembershipEntity.class);
+        return modelMapper.map(CourseMembership, CourseMembershipEntity.class);
     }
 }
