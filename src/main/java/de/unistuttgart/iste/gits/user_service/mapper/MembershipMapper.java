@@ -20,8 +20,8 @@ public class MembershipMapper {
 
     }
 
-    public CourseMembershipEntity dtoToEntity(CourseMembershipInput CourseMembership){
+    public CourseMembershipEntity dtoToEntity(CourseMembershipInput membershipInput){
 
-        return modelMapper.map(CourseMembership, CourseMembershipEntity.class);
+        return modelMapper.map(membershipInput, CourseMembershipEntity.class);
     }
 }
