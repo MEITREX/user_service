@@ -1,7 +1,7 @@
 package de.unistuttgart.iste.gits.user_service.service;
 
-import de.unistuttgart.iste.gits.generated.dto.CourseMembershipDto;
-import de.unistuttgart.iste.gits.generated.dto.CourseMembershipInputDto;
+import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
+import de.unistuttgart.iste.gits.generated.dto.CourseMembershipInput;
 import de.unistuttgart.iste.gits.user_service.mapper.MembershipMapper;
 import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseMembershipEntity;
 import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseMembershipPk;
@@ -27,7 +27,7 @@ public class MembershipService {
      * @param userId User ID for which course memberships are queried
      * @return List of course memberships
      */
-    public List<CourseMembershipDto> getAllMembershipsByUser(UUID userId) {
+    public List<CourseMembership> getAllMembershipsByUser(UUID userId) {
         //init
         List<CourseMembershipEntity> membershipEntities;
 
@@ -44,7 +44,7 @@ public class MembershipService {
      * @param inputDto contains user ID, course ID, and course role
      * @return created entity
      */
-    public CourseMembershipDto createMembership(CourseMembershipInputDto inputDto) {
+    public CourseMembership createMembership(CourseMembershipInput inputDto) {
         CourseMembershipEntity entity = courseMembershipRepository.save(membershipMapper.dtoToEntity(inputDto));
 
         return membershipMapper.entityToDto(entity);
@@ -55,7 +55,7 @@ public class MembershipService {
      * @param inputDto contains user ID, course ID, and course role
      * @return updated entity
      */
-    public CourseMembershipDto updateMembershipRole(CourseMembershipInputDto inputDto) {
+    public CourseMembership updateMembershipRole(CourseMembershipInput inputDto) {
 
         //make sure entity exists in database
         requireMembershipExisting(new CourseMembershipPk(inputDto.getUserId(), inputDto.getCourseId()));
@@ -69,7 +69,7 @@ public class MembershipService {
      * @param inputDto contains user ID, course ID, and course role
      * @return deleted entity
      */
-    public CourseMembershipDto deleteMembership(CourseMembershipInputDto inputDto) {
+    public CourseMembership deleteMembership(CourseMembershipInput inputDto) {
 
         CourseMembershipEntity entity = membershipMapper.dtoToEntity(inputDto);
 

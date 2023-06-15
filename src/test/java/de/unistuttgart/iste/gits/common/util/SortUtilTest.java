@@ -1,6 +1,6 @@
 package de.unistuttgart.iste.gits.common.util;
 
-import de.unistuttgart.iste.gits.generated.dto.SortDirectionDto;
+import de.unistuttgart.iste.gits.generated.dto.SortDirection;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
 
@@ -34,7 +34,7 @@ public class SortUtilTest {
      */
     @Test
     public void testSingleSortField() {
-        Sort sort = SortUtil.createSort(List.of("field"), List.of(SortDirectionDto.ASC));
+        Sort sort = SortUtil.createSort(List.of("field"), List.of(SortDirection.ASC));
 
         assertThat(sort.isSorted(), equalTo(true));
         // count() is used to check that there is only one sort field
@@ -43,7 +43,7 @@ public class SortUtilTest {
         assertThat(order.getProperty(), equalTo("field"));
         assertThat(order.getDirection(), equalTo(Sort.Direction.ASC));
 
-        sort = SortUtil.createSort(List.of("field"), List.of(SortDirectionDto.DESC));
+        sort = SortUtil.createSort(List.of("field"), List.of(SortDirection.DESC));
         assertThat(sort.isSorted(), equalTo(true));
         order = requireNonNull(sort.getOrderFor("field"));
         assertThat(order.getProperty(), equalTo("field"));
@@ -75,7 +75,7 @@ public class SortUtilTest {
     @Test
     public void testMultipleSortFields() {
         Sort sort = SortUtil.createSort(List.of("field1", "field2"),
-                List.of(SortDirectionDto.ASC, SortDirectionDto.DESC));
+                List.of(SortDirection.ASC, SortDirection.DESC));
 
         assertThat(sort.isSorted(), equalTo(true));
         // count() is used to check that there are exactly two sort fields

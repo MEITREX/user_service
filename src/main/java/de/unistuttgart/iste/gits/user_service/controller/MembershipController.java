@@ -1,7 +1,7 @@
 package de.unistuttgart.iste.gits.user_service.controller;
 
-import de.unistuttgart.iste.gits.generated.dto.CourseMembershipDto;
-import de.unistuttgart.iste.gits.generated.dto.CourseMembershipInputDto;
+import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
+import de.unistuttgart.iste.gits.generated.dto.CourseMembershipInput;
 import de.unistuttgart.iste.gits.user_service.service.MembershipService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,22 +21,22 @@ public class MembershipController {
     private final MembershipService membershipService;
 
     @QueryMapping
-    public List<CourseMembershipDto> courseMemberships(@Argument(name="id") UUID userId) {
+    public List<CourseMembership> courseMemberships(@Argument(name="id") UUID userId) {
 
         return membershipService.getAllMembershipsByUser(userId);
     }
     @MutationMapping
-    public CourseMembershipDto createMembership(@Argument(name = "input")CourseMembershipInputDto inputDto){
+    public CourseMembership createMembership(@Argument(name = "input")CourseMembershipInput inputDto){
         return membershipService.createMembership(inputDto);
     }
 
     @MutationMapping
-    public CourseMembershipDto updateMembership(@Argument(name = "input")CourseMembershipInputDto inputDto){
+    public CourseMembership updateMembership(@Argument(name = "input")CourseMembershipInput inputDto){
         return membershipService.updateMembershipRole(inputDto);
     }
 
     @MutationMapping
-    public CourseMembershipDto deleteMembership(@Argument(name = "input")CourseMembershipInputDto inputDto){
+    public CourseMembership deleteMembership(@Argument(name = "input")CourseMembershipInput inputDto){
         return membershipService.deleteMembership(inputDto);
     }
 }

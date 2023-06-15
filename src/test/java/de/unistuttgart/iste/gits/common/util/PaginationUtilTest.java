@@ -1,7 +1,7 @@
 package de.unistuttgart.iste.gits.common.util;
 
-import de.unistuttgart.iste.gits.generated.dto.PaginationDto;
-import de.unistuttgart.iste.gits.generated.dto.PaginationInfoDto;
+import de.unistuttgart.iste.gits.generated.dto.Pagination;
+import de.unistuttgart.iste.gits.generated.dto.PaginationInfo;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.*;
 
@@ -18,7 +18,7 @@ public class PaginationUtilTest {
      * Then an unpaged pageable is returned
      */
     @Test
-    public void testCreatePageableNoPaginationDto() {
+    public void testCreatePageableNoPagination() {
         Pageable pageable = PaginationUtil.createPageable(null, null);
 
         assertThat(pageable.isPaged(), equalTo(false));
@@ -35,12 +35,12 @@ public class PaginationUtilTest {
      */
     @Test
     public void testCreatePageable() {
-        PaginationDto paginationDto = PaginationDto.builder()
+        Pagination pagination = Pagination.builder()
                 .setPage(1)
                 .setSize(10)
                 .build();
 
-        Pageable pageable = PaginationUtil.createPageable(paginationDto, Sort.unsorted());
+        Pageable pageable = PaginationUtil.createPageable(pagination, Sort.unsorted());
         assertThat(pageable.isPaged(), equalTo(true));
         assertThat(pageable.getPageNumber(), equalTo(1));
         assertThat(pageable.getPageSize(), equalTo(10));
@@ -50,34 +50,34 @@ public class PaginationUtilTest {
 
     /**
      * Given a number of total elements
-     * When unpagedPaginationInfoDto is called
+     * When unpagedPaginationInfo is called
      * Then the correct pagination info dto is returned
      */
     @Test
-    public void testCreateUnpagedPaginationInfoDto() {
-        PaginationInfoDto paginationDto = PaginationUtil.unpagedPaginationInfoDto(10);
+    public void testCreateUnpagedPaginationInfo() {
+        PaginationInfo Pagination = PaginationUtil.unpagedPaginationInfo(10);
 
-        assertThat(paginationDto.getPage(), equalTo(0));
-        assertThat(paginationDto.getSize(), equalTo(10));
-        assertThat(paginationDto.getTotalElements(), equalTo(10));
-        assertThat(paginationDto.getTotalPages(), equalTo(1));
-        assertThat(paginationDto.getHasNext(), equalTo(false));
+        assertThat(Pagination.getPage(), equalTo(0));
+        assertThat(Pagination.getSize(), equalTo(10));
+        assertThat(Pagination.getTotalElements(), equalTo(10));
+        assertThat(Pagination.getTotalPages(), equalTo(1));
+        assertThat(Pagination.getHasNext(), equalTo(false));
     }
 
     /**
      * Given a page
-     * When createPaginationInfoDto is called
+     * When createPaginationInfo is called
      * Then the correct pagination info dto is returned
      */
     @Test
-    public void testCreatePaginationInfoDto() {
+    public void testCreatePaginationInfo() {
         Page<?> page = new PageImpl<>(List.of(), PageRequest.of(0, 10), 20);
-        PaginationInfoDto paginationDto = PaginationUtil.createPaginationInfoDto(page);
+        PaginationInfo Pagination = PaginationUtil.createPaginationInfo(page);
 
-        assertThat(paginationDto.getPage(), equalTo(0));
-        assertThat(paginationDto.getSize(), equalTo(10));
-        assertThat(paginationDto.getTotalElements(), equalTo(20));
-        assertThat(paginationDto.getTotalPages(), equalTo(2));
-        assertThat(paginationDto.getHasNext(), equalTo(true));
+        assertThat(Pagination.getPage(), equalTo(0));
+        assertThat(Pagination.getSize(), equalTo(10));
+        assertThat(Pagination.getTotalElements(), equalTo(20));
+        assertThat(Pagination.getTotalPages(), equalTo(2));
+        assertThat(Pagination.getHasNext(), equalTo(true));
     }
 }

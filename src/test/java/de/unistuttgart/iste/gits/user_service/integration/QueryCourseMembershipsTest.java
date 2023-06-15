@@ -1,6 +1,6 @@
 package de.unistuttgart.iste.gits.user_service.integration;
 
-import de.unistuttgart.iste.gits.generated.dto.CourseMembershipDto;
+import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
 import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseMembershipEntity;
 import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseRole;
 import de.unistuttgart.iste.gits.user_service.persistence.repository.CourseMembershipRepository;
@@ -34,7 +34,7 @@ public class QueryCourseMembershipsTest {
         tester.document(query)
                 .execute()
                 .path("courseMemberships")
-                .entityList(CourseMembershipDto.class)
+                .entityList(CourseMembership.class)
                 .hasSize(0);
     }
 
@@ -42,12 +42,12 @@ public class QueryCourseMembershipsTest {
     void testMembership(GraphQlTester tester){
 
         UUID userId = UUID.randomUUID();
-        List<CourseMembershipDto> DTOList = new ArrayList<>();
+        List<CourseMembership> DTOList = new ArrayList<>();
 
         for (int i = 0; i < 2; i++) {
             UUID courseId = UUID.randomUUID();
             CourseMembershipEntity entity = CourseMembershipEntity.builder().userId(userId).courseId(courseId).courseRole(CourseRole.STUDENT).build();
-            CourseMembershipDto dto = CourseMembershipDto.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build();
+            CourseMembership dto = CourseMembership.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build();
             membershipRepository.save(entity);
             DTOList.add(dto);
         }
@@ -64,7 +64,7 @@ public class QueryCourseMembershipsTest {
         tester.document(query)
                 .execute()
                 .path("courseMemberships")
-                .entityList(CourseMembershipDto.class)
+                .entityList(CourseMembership.class)
                 .hasSize(2)
                 .contains(DTOList.get(0), DTOList.get(1));
     }
