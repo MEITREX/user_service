@@ -1,18 +1,24 @@
 package de.unistuttgart.iste.gits.user_service.integration;
 
+import de.unistuttgart.iste.gits.common.testutil.GitsPostgresSqlContainer;
+import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
 import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseMembershipEntity;
 import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseRole;
 import de.unistuttgart.iste.gits.user_service.persistence.repository.CourseMembershipRepository;
-import de.unistuttgart.iste.gits.util.GraphQlApiTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
 
 import java.util.UUID;
 
 @GraphQlApiTest
 public class MutationCourseMembershipTest {
+
+    @Container
+    public static PostgreSQLContainer<GitsPostgresSqlContainer> postgreSQLContainer = GitsPostgresSqlContainer.getInstance();
 
     @Autowired
     CourseMembershipRepository courseMembershipRepository;
