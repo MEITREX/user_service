@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,6 +38,33 @@ public class MembershipService {
         return membershipEntities.stream()
                 .map(membershipMapper::entityToDto)
                 .toList();
+    }
+
+    /**
+     * Allows to retrieve a List of Membership Objects that link a course with a User and their role in the course
+     * for multiple users.
+     * @param userIds The user IDs for which course memberships are queried.
+     * @return List of course memberships for each user. The list is ordered by the order of the user IDs in the input.
+     */
+    public List<List<CourseMembership>> getMembershipsByUserBatched(List<UUID> userIds) {
+        List<CourseMembershipEntity> entities =
+                courseMembershipRepository.findCourseMembershipEntitiesByUserIdInOrderByCourseId(userIds);
+
+        List<List<CourseMembership>> result = new ArrayList<>(userIds.size());
+
+        // fill it with empty lists for each user id. This way we can later add
+        // the course memberships associated with that user
+        for (int i = 0; i < userIds.size(); i++) {
+            result.add(new ArrayList<>());
+        }
+
+        // sort the course memberships into the lists for each user
+        for(CourseMembershipEntity entity : entities) {
+            int index = userIds.indexOf(entity.getUserId());
+            result.get(index).add(membershipMapper.entityToDto(entity));
+        }
+
+        return result;
     }
 
     /**

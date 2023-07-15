@@ -1,0 +1,11 @@
+type PublicUserInfo {
+    id: UUID!
+    userName: String!
+}
+
+type UserInfo {
+    id: UUID!
+    userName: String!
+    firstName: String!
+    lastName: String!
+}

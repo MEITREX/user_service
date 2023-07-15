@@ -25,6 +25,12 @@ public class MembershipController {
 
         return membershipService.getAllMembershipsByUser(userId);
     }
+
+    @QueryMapping
+    public List<List<CourseMembership>> courseMembershipsBatched(@Argument(name="ids") List<UUID> userIds) {
+        return membershipService.getMembershipsByUserBatched(userIds);
+    }
+
     @MutationMapping
     public CourseMembership createMembership(@Argument(name = "input")CourseMembershipInput inputDto){
         return membershipService.createMembership(inputDto);
