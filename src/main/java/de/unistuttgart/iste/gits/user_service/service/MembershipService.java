@@ -1,5 +1,7 @@
 package de.unistuttgart.iste.gits.user_service.service;
 
+import de.unistuttgart.iste.gits.common.event.CourseChangeEvent;
+import de.unistuttgart.iste.gits.common.event.CrudOperation;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembershipInput;
 import de.unistuttgart.iste.gits.user_service.mapper.MembershipMapper;
@@ -108,6 +110,39 @@ public class MembershipService {
         courseMembershipRepository.deleteById(membershipPk);
 
         return membershipMapper.entityToDto(entity);
+    }
+
+    /**
+     * removes all memberships for a given course ID from the database
+     * @param courseId valid course ID
+     */
+    public void deleteMembershipByCourseId(UUID courseId){
+
+        List<CourseMembershipEntity> memberships = courseMembershipRepository.findCourseMembershipEntitiesByCourseId(courseId);
+
+        if (memberships != null && !memberships.isEmpty()){
+            courseMembershipRepository.deleteAll(memberships);
+        }
+    }
+
+    /**
+     * method to handle course deletion events. removes all course memberships associated with the course ID
+     * @param changeEvent course change event
+     */
+    public void removeCourse(CourseChangeEvent changeEvent){
+        // evaluate course Update message
+        if (changeEvent.getCourseId() == null || changeEvent.getOperation() == null){
+            throw new NullPointerException("incomplete message received: all fields of a message must be non-null");
+        }
+        //only consider DELETE events
+        if (!changeEvent.getOperation().equals(CrudOperation.DELETE)){
+            return;
+        }
+
+        //delete Memberships in course
+        deleteMembershipByCourseId(changeEvent.getCourseId());
+
+
     }
 
     /**
