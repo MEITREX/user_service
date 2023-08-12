@@ -26,7 +26,7 @@ type Query {
     userInfo(id: UUID!): UserInfo!
     """
     Gets all of the users' information for a list of users with the specified IDs.
-    Only available to the user themselves and privileged users.
+    Only available to privileged users.
     """
     userInfoBatched(ids: [UUID!]!): [UserInfo!]!
 }
