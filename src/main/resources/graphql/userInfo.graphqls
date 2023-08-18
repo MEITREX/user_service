@@ -8,4 +8,5 @@ type UserInfo {
     userName: String!
     firstName: String!
     lastName: String!
+    courseMemberships: [CourseMembership!]!
 }

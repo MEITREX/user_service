@@ -1,6 +1,5 @@
 package de.unistuttgart.iste.gits.user_service.api;
 
-import de.unistuttgart.iste.gits.common.testutil.GitsPostgresSqlContainer;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
 import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseMembershipEntity;
@@ -11,17 +10,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 
 import java.util.UUID;
 
 @ContextConfiguration(classes = MockKeycloakConfiguration.class)
 @GraphQlApiTest
-public class MutationCourseMembershipTest {
-
-    @Container
-    public static PostgreSQLContainer<GitsPostgresSqlContainer> postgreSQLContainer = GitsPostgresSqlContainer.getInstance();
+class MutationCourseMembershipTest {
 
     @Autowired
     CourseMembershipRepository courseMembershipRepository;
@@ -29,7 +23,11 @@ public class MutationCourseMembershipTest {
     @Test
     void createMembershipTest(GraphQlTester tester){
 
-        CourseMembership expectedDto = CourseMembership.builder().setUserId(UUID.randomUUID()).setCourseId(UUID.randomUUID()).setRole(CourseRole.STUDENT.toString()).build();
+        CourseMembership expectedDto = CourseMembership.builder()
+                .setUserId(UUID.randomUUID())
+                .setCourseId(UUID.randomUUID())
+                .setRole(CourseRole.STUDENT.toString())
+                .build();
 
         String query = """
                 mutation {
@@ -61,7 +59,11 @@ public class MutationCourseMembershipTest {
         UUID userId = UUID.randomUUID();
         UUID courseId = UUID.randomUUID();
 
-        CourseMembership expectedDto = CourseMembership.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build();
+        CourseMembership expectedDto = CourseMembership.builder()
+                .setUserId(userId)
+                .setCourseId(courseId)
+                .setRole(CourseRole.STUDENT.toString())
+                .build();
 
         String query = """
                 mutation {
@@ -92,8 +94,16 @@ public class MutationCourseMembershipTest {
         UUID userId = UUID.randomUUID();
         UUID courseId = UUID.randomUUID();
 
-        CourseMembershipEntity entity = CourseMembershipEntity.builder().userId(userId).courseId(courseId).courseRole(CourseRole.STUDENT).build();
-        CourseMembership expectedDto = CourseMembership.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build();
+        CourseMembershipEntity entity = CourseMembershipEntity.builder()
+                .userId(userId)
+                .courseId(courseId)
+                .courseRole(CourseRole.STUDENT)
+                .build();
+        CourseMembership expectedDto = CourseMembership.builder()
+                .setUserId(userId)
+                .setCourseId(courseId)
+                .setRole(CourseRole.STUDENT.toString())
+                .build();
 
         //create entity in DB
         courseMembershipRepository.save(entity);
@@ -128,7 +138,11 @@ public class MutationCourseMembershipTest {
         UUID userId = UUID.randomUUID();
         UUID courseId = UUID.randomUUID();
 
-        CourseMembership expectedDto = CourseMembership.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build();
+        CourseMembership expectedDto = CourseMembership.builder()
+                .setUserId(userId)
+                .setCourseId(courseId)
+                .setRole(CourseRole.STUDENT.toString())
+                .build();
 
 
         String query = """
@@ -160,8 +174,15 @@ public class MutationCourseMembershipTest {
         UUID userId = UUID.randomUUID();
         UUID courseId = UUID.randomUUID();
 
-        CourseMembershipEntity entity = CourseMembershipEntity.builder().userId(userId).courseId(courseId).courseRole(CourseRole.STUDENT).build();
-        CourseMembership expectedDto = CourseMembership.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build();
+        CourseMembershipEntity entity = CourseMembershipEntity.builder()
+                .userId(userId)
+                .courseId(courseId)
+                .courseRole(CourseRole.STUDENT).build();
+        CourseMembership expectedDto = CourseMembership.builder()
+                .setUserId(userId)
+                .setCourseId(courseId)
+                .setRole(CourseRole.STUDENT.toString())
+                .build();
 
         //create entity in DB
         courseMembershipRepository.save(entity);

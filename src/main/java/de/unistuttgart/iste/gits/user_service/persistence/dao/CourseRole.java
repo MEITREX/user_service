@@ -4,4 +4,4 @@ public enum CourseRole {
     STUDENT,
     TUTOR,
     ADMINISTRATOR
-};
+}

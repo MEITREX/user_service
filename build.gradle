@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.0.6'
 	id 'io.spring.dependency-management' version '1.1.0'
-	id "io.github.kobylynskyi.graphql.codegen" version "5.7.2"	
+	id "io.github.kobylynskyi.graphql.codegen" version "5.8.0"
 	id "org.sonarqube" version "4.0.0.2929"
 	id "jacoco"
 	
@@ -67,7 +67,7 @@ repositories {
 }
 
 dependencies {
-	implementation 'de.unistuttgart.iste.gits:gits-common:0.1.1'
+	implementation 'de.unistuttgart.iste.gits:gits-common:0.2.0'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-graphql'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
