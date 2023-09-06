@@ -5,6 +5,7 @@ import de.unistuttgart.iste.gits.generated.dto.PublicUserInfo;
 import de.unistuttgart.iste.gits.generated.dto.UserInfo;
 import de.unistuttgart.iste.gits.user_service.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.*;
 import org.springframework.stereotype.Controller;
 
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -24,6 +26,7 @@ public class UserController {
 
     @QueryMapping
     public UserInfo currentUserInfo(@ContextValue LoggedInUser currentUser) {
+        log.info("Current user: " + currentUser.getId());
         return userService.getUserInfo(currentUser.getId());
     }
 
