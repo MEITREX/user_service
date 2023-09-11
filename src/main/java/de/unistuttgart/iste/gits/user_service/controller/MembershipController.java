@@ -22,17 +22,17 @@ public class MembershipController {
     }
 
     @MutationMapping
-    public CourseMembership createMembership(@Argument(name = "input")CourseMembershipInput inputDto){
+    public CourseMembership createMembership(@Argument(name = "input") CourseMembershipInput inputDto) {
         return membershipService.createMembership(inputDto);
     }
 
     @MutationMapping
-    public CourseMembership updateMembership(@Argument(name = "input")CourseMembershipInput inputDto){
+    public CourseMembership updateMembership(@Argument(name = "input") CourseMembershipInput inputDto) {
         return membershipService.updateMembershipRole(inputDto);
     }
 
     @MutationMapping
-    public CourseMembership deleteMembership(@Argument(name = "input")CourseMembershipInput inputDto){
+    public CourseMembership deleteMembership(@Argument(name = "input") CourseMembershipInput inputDto) {
         return membershipService.deleteMembership(inputDto);
     }
 }

@@ -2,7 +2,7 @@ package de.unistuttgart.iste.gits.user_service.mapper;
 
 import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembershipInput;
-import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseMembershipEntity;
+import de.unistuttgart.iste.gits.user_service.persistence.entity.CourseMembershipEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;

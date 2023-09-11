@@ -1,4 +1,4 @@
-package de.unistuttgart.iste.gits.user_service.persistence.dao;
+package de.unistuttgart.iste.gits.user_service.persistence.entity;
 
 public enum CourseRole {
     STUDENT,

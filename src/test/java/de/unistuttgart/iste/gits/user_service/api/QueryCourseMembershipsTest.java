@@ -2,8 +2,8 @@ package de.unistuttgart.iste.gits.user_service.api;
 
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
-import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseMembershipEntity;
-import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseRole;
+import de.unistuttgart.iste.gits.user_service.persistence.entity.CourseMembershipEntity;
+import de.unistuttgart.iste.gits.user_service.persistence.entity.CourseRole;
 import de.unistuttgart.iste.gits.user_service.persistence.repository.CourseMembershipRepository;
 import de.unistuttgart.iste.gits.user_service.test_config.MockKeycloakConfiguration;
 import org.junit.jupiter.api.Test;

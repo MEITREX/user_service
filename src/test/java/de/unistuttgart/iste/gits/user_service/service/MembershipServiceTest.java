@@ -4,16 +4,14 @@ import de.unistuttgart.iste.gits.common.event.CourseChangeEvent;
 import de.unistuttgart.iste.gits.common.event.CrudOperation;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
 import de.unistuttgart.iste.gits.user_service.mapper.MembershipMapper;
-import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseMembershipEntity;
-import de.unistuttgart.iste.gits.user_service.persistence.dao.CourseRole;
+import de.unistuttgart.iste.gits.user_service.persistence.entity.CourseMembershipEntity;
+import de.unistuttgart.iste.gits.user_service.persistence.entity.CourseRole;
 import de.unistuttgart.iste.gits.user_service.persistence.repository.CourseMembershipRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;

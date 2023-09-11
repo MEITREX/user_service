@@ -8,10 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 @Controller
 @Slf4j
@@ -21,7 +18,7 @@ public class SubscriptionController {
 
     @Topic(name = "course-changes", pubsubName = "gits")
     @PostMapping(path = "/user-service/course-changes-pubsub")
-    public Mono<Void> updateAssociation(@RequestBody CloudEvent<CourseChangeEvent> cloudEvent, @RequestHeader Map<String, String> headers){
+    public Mono<Void> updateAssociation(@RequestBody CloudEvent<CourseChangeEvent> cloudEvent) {
 
         return Mono.fromRunnable(
                 () -> {
