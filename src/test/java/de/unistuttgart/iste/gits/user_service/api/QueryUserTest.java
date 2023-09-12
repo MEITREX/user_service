@@ -10,6 +10,7 @@ import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.graphql.test.tester.HttpGraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,7 +20,11 @@ class QueryUserTest {
 
     @Test
     void testCurrentUserInfo(HttpGraphQlTester tester) throws JsonProcessingException {
-        LoggedInUser user = new LoggedInUser(MockKeycloakConfiguration.firstUserId, "firstuser", "First", "User");
+        LoggedInUser user = new LoggedInUser(MockKeycloakConfiguration.firstUserId,
+                "firstuser",
+                "First",
+                "User",
+                Collections.emptyList());
         String userJson = new ObjectMapper().writeValueAsString(user);
 
         String query = """
