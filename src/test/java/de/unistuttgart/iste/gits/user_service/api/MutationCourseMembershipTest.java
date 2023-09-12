@@ -2,8 +2,8 @@ package de.unistuttgart.iste.gits.user_service.api;
 
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
+import de.unistuttgart.iste.gits.generated.dto.UserRoleInCourse;
 import de.unistuttgart.iste.gits.user_service.persistence.entity.CourseMembershipEntity;
-import de.unistuttgart.iste.gits.user_service.persistence.entity.CourseRole;
 import de.unistuttgart.iste.gits.user_service.persistence.repository.CourseMembershipRepository;
 import de.unistuttgart.iste.gits.user_service.test_config.MockKeycloakConfiguration;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ class MutationCourseMembershipTest {
         CourseMembership expectedDto = CourseMembership.builder()
                 .setUserId(UUID.randomUUID())
                 .setCourseId(UUID.randomUUID())
-                .setRole(CourseRole.STUDENT.toString())
+                .setRole(UserRoleInCourse.STUDENT)
                 .build();
 
         String query = """
@@ -35,7 +35,7 @@ class MutationCourseMembershipTest {
                         input: {
                             userId: "%s"
                             courseId: "%s"
-                            role: "%s"
+                            role: %s
                         }
                     ) {
                         userId
@@ -62,7 +62,7 @@ class MutationCourseMembershipTest {
         CourseMembership expectedDto = CourseMembership.builder()
                 .setUserId(userId)
                 .setCourseId(courseId)
-                .setRole(CourseRole.STUDENT.toString())
+                .setRole(UserRoleInCourse.STUDENT)
                 .build();
 
         String query = """
@@ -71,7 +71,7 @@ class MutationCourseMembershipTest {
                         input: {
                             userId: "%s"
                             courseId: "%s"
-                            role: "%s"
+                            role: %s
                         }
                     ) {
                         userId
@@ -97,12 +97,12 @@ class MutationCourseMembershipTest {
         CourseMembershipEntity entity = CourseMembershipEntity.builder()
                 .userId(userId)
                 .courseId(courseId)
-                .courseRole(CourseRole.STUDENT)
+                .role(UserRoleInCourse.STUDENT)
                 .build();
         CourseMembership expectedDto = CourseMembership.builder()
                 .setUserId(userId)
                 .setCourseId(courseId)
-                .setRole(CourseRole.STUDENT.toString())
+                .setRole(UserRoleInCourse.STUDENT)
                 .build();
 
         //create entity in DB
@@ -114,7 +114,7 @@ class MutationCourseMembershipTest {
                         input: {
                             userId: "%s"
                             courseId: "%s"
-                            role: "%s"
+                            role: %s
                         }
                     ) {
                         userId
@@ -141,7 +141,7 @@ class MutationCourseMembershipTest {
         CourseMembership expectedDto = CourseMembership.builder()
                 .setUserId(userId)
                 .setCourseId(courseId)
-                .setRole(CourseRole.STUDENT.toString())
+                .setRole(UserRoleInCourse.STUDENT)
                 .build();
 
 
@@ -151,7 +151,7 @@ class MutationCourseMembershipTest {
                         input: {
                             userId: "%s"
                             courseId: "%s"
-                            role: "%s"
+                            role: %s
                         }
                     ) {
                         userId
@@ -177,11 +177,11 @@ class MutationCourseMembershipTest {
         CourseMembershipEntity entity = CourseMembershipEntity.builder()
                 .userId(userId)
                 .courseId(courseId)
-                .courseRole(CourseRole.STUDENT).build();
+                .role(UserRoleInCourse.STUDENT).build();
         CourseMembership expectedDto = CourseMembership.builder()
                 .setUserId(userId)
                 .setCourseId(courseId)
-                .setRole(CourseRole.STUDENT.toString())
+                .setRole(UserRoleInCourse.STUDENT)
                 .build();
 
         //create entity in DB
@@ -193,7 +193,7 @@ class MutationCourseMembershipTest {
                         input: {
                             userId: "%s"
                             courseId: "%s"
-                            role: "%s"
+                            role: %s
                         }
                     ) {
                         userId

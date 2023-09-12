@@ -2,8 +2,8 @@ package de.unistuttgart.iste.gits.user_service.api;
 
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
+import de.unistuttgart.iste.gits.generated.dto.UserRoleInCourse;
 import de.unistuttgart.iste.gits.user_service.persistence.entity.CourseMembershipEntity;
-import de.unistuttgart.iste.gits.user_service.persistence.entity.CourseRole;
 import de.unistuttgart.iste.gits.user_service.persistence.repository.CourseMembershipRepository;
 import de.unistuttgart.iste.gits.user_service.test_config.MockKeycloakConfiguration;
 import org.junit.jupiter.api.Test;
@@ -49,8 +49,8 @@ class QueryCourseMembershipsTest {
 
         for (int i = 0; i < 2; i++) {
             UUID courseId = UUID.randomUUID();
-            CourseMembershipEntity entity = CourseMembershipEntity.builder().userId(userId).courseId(courseId).courseRole(CourseRole.STUDENT).build();
-            CourseMembership dto = CourseMembership.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build();
+            CourseMembershipEntity entity = CourseMembershipEntity.builder().userId(userId).courseId(courseId).role(UserRoleInCourse.STUDENT).build();
+            CourseMembership dto = CourseMembership.builder().setUserId(userId).setCourseId(courseId).setRole(UserRoleInCourse.STUDENT).build();
             membershipRepository.save(entity);
             DTOList.add(dto);
         }

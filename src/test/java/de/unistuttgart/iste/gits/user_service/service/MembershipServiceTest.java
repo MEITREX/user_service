@@ -3,15 +3,17 @@ package de.unistuttgart.iste.gits.user_service.service;
 import de.unistuttgart.iste.gits.common.event.CourseChangeEvent;
 import de.unistuttgart.iste.gits.common.event.CrudOperation;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
+import de.unistuttgart.iste.gits.generated.dto.UserRoleInCourse;
 import de.unistuttgart.iste.gits.user_service.mapper.MembershipMapper;
 import de.unistuttgart.iste.gits.user_service.persistence.entity.CourseMembershipEntity;
-import de.unistuttgart.iste.gits.user_service.persistence.entity.CourseRole;
 import de.unistuttgart.iste.gits.user_service.persistence.repository.CourseMembershipRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,8 +36,8 @@ class MembershipServiceTest {
 
         for (int i=0; i<3; i++){
             UUID courseId = UUID.randomUUID();
-            entities.add(CourseMembershipEntity.builder().userId(userId).courseId(courseId).courseRole(CourseRole.STUDENT).build());
-            membershipDtos.add(CourseMembership.builder().setUserId(userId).setCourseId(courseId).setRole(CourseRole.STUDENT.toString()).build());
+            entities.add(CourseMembershipEntity.builder().userId(userId).courseId(courseId).role(UserRoleInCourse.STUDENT).build());
+            membershipDtos.add(CourseMembership.builder().setUserId(userId).setCourseId(courseId).setRole(UserRoleInCourse.STUDENT).build());
         }
 
         //mock repository
@@ -62,12 +64,12 @@ class MembershipServiceTest {
         List<CourseMembershipEntity> memberships = List.of(CourseMembershipEntity.builder()
                         .courseId(courseId)
                         .userId(UUID.randomUUID())
-                        .courseRole(CourseRole.STUDENT)
+                        .role(UserRoleInCourse.STUDENT)
                         .build(),
                 CourseMembershipEntity.builder()
                         .courseId(courseId)
                         .userId(UUID.randomUUID())
-                        .courseRole(CourseRole.ADMINISTRATOR)
+                        .role(UserRoleInCourse.ADMINISTRATOR)
                         .build()
                 );
 
