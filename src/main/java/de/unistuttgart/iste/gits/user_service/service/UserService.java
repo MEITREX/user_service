@@ -3,6 +3,10 @@ package de.unistuttgart.iste.gits.user_service.service;
 import de.unistuttgart.iste.gits.generated.dto.PublicUserInfo;
 import de.unistuttgart.iste.gits.generated.dto.UserInfo;
 import de.unistuttgart.iste.gits.user_service.config.KeycloakWrapper;
+import graphql.language.SelectionSet;
+import graphql.schema.DataFetchingEnvironment;
+import graphql.schema.DataFetchingFieldSelectionSet;
+import graphql.schema.SelectedField;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +53,25 @@ public class UserService {
      * @param ids List of user ids
      * @return List of (nullable) user infos
      */
-    public List<UserInfo> findUserInfos(List<UUID> ids) {
+    public List<UserInfo> findUserInfos(List<UUID> ids, DataFetchingEnvironment env) {
+        // the selection set also contains fields of children, so we first need to filter only the direct child fields
+        // of the user info type
+        List<SelectedField> userInfoSubfields = env.getSelectionSet().getFields().stream()
+                .filter(field -> field.getObjectTypeNames().contains("UserInfo"))
+                .toList();
+
+        // if we're not requesting any fields except courseMemberships, we can skip the fetching of user data because
+        // the data is never used by graphql (course membership data is handled in its own schema mapping)
+        if(userInfoSubfields.stream().filter(field -> field.getObjectTypeNames().contains("UserInfo")).count() == 1
+                && userInfoSubfields.get(0).getName().equals("courseMemberships")) {
+            // just return a list of empty user infos, just set their id and nothing else
+            return ids.stream().map(x -> {
+                UserInfo user = new UserInfo();
+                user.setId(x);
+                return user;
+            }).toList();
+        }
+
         return ids.stream()
                 .map(this::findUserInfo)
                 .map(optional -> optional.orElse(null))
