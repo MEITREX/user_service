@@ -15,3 +15,14 @@ The User Service has two main roles in our system:
 2. **GraphQL Interface for User Metadata Retrieval:**
 
    With the GraphQL interface, the User Service simplifies the process of getting user information from Keycloak. This can include personal details. It provides an easy and standardized way for other parts of the system to access this data.
+
+## API description
+
+The GraphQL API is described in the [api.md file](api.md).
+
+The endpoint for the GraphQL API is `/graphql`. The GraphQL Playground is available at `/graphiql`.
+
+## How to run
+
+How to run services locally is described in
+the [wiki](https://gits-enpro.readthedocs.io/en/latest/dev-manuals/backend/get-started.html).
