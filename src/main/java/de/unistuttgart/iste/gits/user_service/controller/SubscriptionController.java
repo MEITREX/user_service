@@ -19,7 +19,7 @@ public class SubscriptionController {
     @Topic(name = "course-changes", pubsubName = "gits")
     @PostMapping(path = "/user-service/course-changes-pubsub")
     public Mono<Void> updateAssociation(@RequestBody CloudEvent<CourseChangeEvent> cloudEvent) {
-
+        log.info("Received course change event: {}", cloudEvent.getData());
         return Mono.fromRunnable(
                 () -> {
                     try {
