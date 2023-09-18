@@ -2,6 +2,7 @@ package de.unistuttgart.iste.gits.user_service.service;
 
 import de.unistuttgart.iste.gits.common.event.CourseChangeEvent;
 import de.unistuttgart.iste.gits.common.event.CrudOperation;
+import de.unistuttgart.iste.gits.common.exception.IncompleteEventMessageException;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
 import de.unistuttgart.iste.gits.generated.dto.UserRoleInCourse;
 import de.unistuttgart.iste.gits.user_service.mapper.MembershipMapper;
@@ -102,7 +103,7 @@ class MembershipServiceTest {
         CourseChangeEvent courseEventNoOperation = CourseChangeEvent.builder().courseId(UUID.randomUUID()).build();
 
         //execute method under test
-        assertThrows(NullPointerException.class, () -> membershipService.removeCourse(courseEventNoId));
-        assertThrows(NullPointerException.class, () -> membershipService.removeCourse(courseEventNoOperation));
+        assertThrows(IncompleteEventMessageException.class, () -> membershipService.removeCourse(courseEventNoId));
+        assertThrows(IncompleteEventMessageException.class, () -> membershipService.removeCourse(courseEventNoOperation));
     }
 }
