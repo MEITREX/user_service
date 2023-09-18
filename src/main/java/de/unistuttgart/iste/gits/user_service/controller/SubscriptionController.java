@@ -27,7 +27,7 @@ public class SubscriptionController {
                 () -> {
                     try {
                         membershipService.removeCourse(cloudEvent.getData());
-                    } catch (IncompleteEventMessageException e) {
+                    } catch (Exception e) {
                         log.error("Error while processing course-changes event. {}", e.getMessage());
                     }
                 });
