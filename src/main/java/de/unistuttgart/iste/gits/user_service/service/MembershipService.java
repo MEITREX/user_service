@@ -2,7 +2,6 @@ package de.unistuttgart.iste.gits.user_service.service;
 
 import de.unistuttgart.iste.gits.common.event.CourseChangeEvent;
 import de.unistuttgart.iste.gits.common.event.CrudOperation;
-import de.unistuttgart.iste.gits.common.exception.IncompleteEventMessageException;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembershipInput;
 import de.unistuttgart.iste.gits.user_service.mapper.MembershipMapper;
@@ -102,10 +101,10 @@ public class MembershipService {
      * method to handle course deletion events. removes all course memberships associated with the course ID
      * @param changeEvent course change event
      */
-    public void removeCourse(CourseChangeEvent changeEvent) throws IncompleteEventMessageException {
+    public void removeCourse(CourseChangeEvent changeEvent){
         // evaluate course Update message
         if (changeEvent.getCourseId() == null || changeEvent.getOperation() == null){
-            throw new IncompleteEventMessageException(IncompleteEventMessageException.ERROR_INCOMPLETE_MESSAGE);
+            throw new NullPointerException("incomplete message received: all fields of a message must be non-null");
         }
         //only consider DELETE events
         if (!changeEvent.getOperation().equals(CrudOperation.DELETE)){
