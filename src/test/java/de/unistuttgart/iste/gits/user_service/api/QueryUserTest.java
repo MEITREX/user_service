@@ -2,10 +2,12 @@ package de.unistuttgart.iste.gits.user_service.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
+import de.unistuttgart.iste.gits.common.testutil.GraphQlTesterParameterResolver;
 import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.gits.user_service.test_config.MockKeycloakConfiguration;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.graphql.test.tester.HttpGraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
@@ -14,8 +16,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+@ExtendWith(GraphQlTesterParameterResolver.class)
+@SpringBootTest({"spring.main.allow-bean-definition-overriding=true"})
 @ContextConfiguration(classes = MockKeycloakConfiguration.class)
-@GraphQlApiTest
 class QueryUserTest {
 
     @Test

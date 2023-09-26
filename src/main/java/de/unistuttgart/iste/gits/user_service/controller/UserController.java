@@ -29,8 +29,7 @@ public class UserController {
                 currentUser.getId(),
                 currentUser.getUserName(),
                 currentUser.getFirstName(),
-                currentUser.getLastName(),
-                List.of() // course memberships are resolved with schema mapping
+                currentUser.getLastName()
         );
     }
 

@@ -1,19 +1,6 @@
 version: "3"
 
 services:
-  database-user:
-    image: postgres:alpine
-    restart: always
-    expose:
-      - 5032
-    ports:
-      - "5032:5432"
-    volumes:
-      - userdata:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=user_service
   app-user:
     build:
       context: ./../user_service # necessary because otherwise docker-compose overrides the context path when merging multiple docker-compose.yml files
@@ -26,12 +13,6 @@ services:
     ports:
       - "5000:5000"
       - "5001:5001"
-    depends_on:
-      - database-user
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://database-user:5432/user_service
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
   dapr-user:
     image: "daprio/daprd"
     command: [

@@ -3,37 +3,32 @@
 <details>
   <summary><strong>Table of Contents</strong></summary>
 
-* [Query](#query)
-* [Mutation](#mutation)
-* [Objects](#objects)
-  * [CourseMembership](#coursemembership)
-  * [PaginationInfo](#paginationinfo)
-  * [PublicUserInfo](#publicuserinfo)
-  * [UserInfo](#userinfo)
-* [Inputs](#inputs)
-  * [CourseMembershipInput](#coursemembershipinput)
-  * [DateTimeFilter](#datetimefilter)
-  * [IntFilter](#intfilter)
-  * [Pagination](#pagination)
-  * [StringFilter](#stringfilter)
-* [Enums](#enums)
-  * [SortDirection](#sortdirection)
-  * [UserRoleInCourse](#userroleincourse)
-* [Scalars](#scalars)
-  * [Boolean](#boolean)
-  * [Date](#date)
-  * [DateTime](#datetime)
-  * [Int](#int)
-  * [LocalTime](#localtime)
-  * [String](#string)
-  * [Time](#time)
-  * [UUID](#uuid)
-  * [Url](#url)
+  * [Query](#query)
+  * [Objects](#objects)
+    * [PaginationInfo](#paginationinfo)
+    * [PublicUserInfo](#publicuserinfo)
+    * [UserInfo](#userinfo)
+  * [Inputs](#inputs)
+    * [DateTimeFilter](#datetimefilter)
+    * [IntFilter](#intfilter)
+    * [Pagination](#pagination)
+    * [StringFilter](#stringfilter)
+  * [Enums](#enums)
+    * [SortDirection](#sortdirection)
+  * [Scalars](#scalars)
+    * [Boolean](#boolean)
+    * [Date](#date)
+    * [DateTime](#datetime)
+    * [Int](#int)
+    * [LocalTime](#localtime)
+    * [String](#string)
+    * [Time](#time)
+    * [UUID](#uuid)
+    * [Url](#url)
 
 </details>
 
 ## Query
-
 <table>
 <thead>
 <tr>
@@ -90,117 +85,10 @@ If a user does not exist, null is returned for that user.
 </tbody>
 </table>
 
-## Mutation
-
-<table>
-<thead>
-<tr>
-<th align="left">Field</th>
-<th align="right">Argument</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>createMembership</strong></td>
-<td valign="top"><a href="#coursemembership">CourseMembership</a>!</td>
-<td>
-
-
-registers a user to a course with a role
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">input</td>
-<td valign="top"><a href="#coursemembershipinput">CourseMembershipInput</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>updateMembership</strong></td>
-<td valign="top"><a href="#coursemembership">CourseMembership</a>!</td>
-<td>
-
-
-updates the role of a user in a course
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">input</td>
-<td valign="top"><a href="#coursemembershipinput">CourseMembershipInput</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>deleteMembership</strong></td>
-<td valign="top"><a href="#coursemembership">CourseMembership</a>!</td>
-<td>
-
-
-deletes user course link
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">input</td>
-<td valign="top"><a href="#coursemembershipinput">CourseMembershipInput</a>!</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-
 ## Objects
 
-### CourseMembership
-
-Represents a course membership object of a user. Each user can be a member of set of courses and some users can also own
-courses
-
-<table>
-<thead>
-<tr>
-<th align="left">Field</th>
-<th align="right">Argument</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>userId</strong></td>
-<td valign="top"><a href="#uuid">UUID</a>!</td>
-<td>
-
-
-Id of the user.
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>courseId</strong></td>
-<td valign="top"><a href="#uuid">UUID</a>!</td>
-<td>
-
-
-Id of the course the user is a member of.
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>role</strong></td>
-<td valign="top"><a href="#userroleincourse">UserRoleInCourse</a>!</td>
-<td>
-
-
-The role of the user in the course.
-
-</td>
-</tr>
-</tbody>
-</table>
-
 ### PaginationInfo
+
 
 Return type for information about paginated results.
 
@@ -324,63 +212,13 @@ Whether there is a next page.
 <td valign="top"><a href="#string">String</a>!</td>
 <td></td>
 </tr>
-<tr>
-<td colspan="2" valign="top"><strong>courseMemberships</strong></td>
-<td valign="top">[<a href="#coursemembership">CourseMembership</a>!]!</td>
-<td></td>
-</tr>
 </tbody>
 </table>
 
 ## Inputs
 
-### CourseMembershipInput
-
-Represents a course membership input object of a user.
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>userId</strong></td>
-<td valign="top"><a href="#uuid">UUID</a>!</td>
-<td>
-
-
-Id of the user.
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>courseId</strong></td>
-<td valign="top"><a href="#uuid">UUID</a>!</td>
-<td>
-
-
-Id of the course the user is a member of.
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>role</strong></td>
-<td valign="top"><a href="#userroleincourse">UserRoleInCourse</a>!</td>
-<td>
-
-
-The role of the user in the course.
-
-</td>
-</tr>
-</tbody>
-</table>
-
 ### DateTimeFilter
+
 
 Filter for date values.
 If multiple filters are specified, they are combined with AND.
@@ -418,6 +256,7 @@ If specified, filters for dates before the specified value.
 </table>
 
 ### IntFilter
+
 
 Filter for integer values.
 If multiple filters are specified, they are combined with AND.
@@ -466,6 +305,7 @@ If specified, filters for values less than to the specified value.
 
 ### Pagination
 
+
 Specifies the page size and page number for paginated results.
 
 <table>
@@ -504,6 +344,7 @@ The number of elements per page.
 </table>
 
 ### StringFilter
+
 
 Filter for string values.
 If multiple filters are specified, they are combined with AND.
@@ -554,6 +395,7 @@ If true, the filter is case-insensitive.
 
 ### SortDirection
 
+
 Specifies the sort direction, either ascending or descending.
 
 <table>
@@ -568,31 +410,6 @@ Specifies the sort direction, either ascending or descending.
 </tr>
 <tr>
 <td valign="top"><strong>DESC</strong></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-
-### UserRoleInCourse
-
-Enum containing all valid roles a user can have in a course.
-
-<table>
-<thead>
-<th align="left">Value</th>
-<th align="left">Description</th>
-</thead>
-<tbody>
-<tr>
-<td valign="top"><strong>STUDENT</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>TUTOR</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>ADMINISTRATOR</strong></td>
 <td></td>
 </tr>
 </tbody>
