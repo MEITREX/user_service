@@ -1,7 +1,6 @@
 package de.unistuttgart.iste.gits.user_service.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlTesterParameterResolver;
 import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.gits.user_service.test_config.MockKeycloakConfiguration;
@@ -14,7 +13,11 @@ import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+
+import static de.unistuttgart.iste.gits.common.testutil.HeaderUtils.addCurrentUserHeader;
+
 
 @ExtendWith(GraphQlTesterParameterResolver.class)
 @SpringBootTest({"spring.main.allow-bean-definition-overriding=true"})
@@ -23,38 +26,84 @@ class QueryUserTest {
 
     @Test
     void testCurrentUserInfo(HttpGraphQlTester tester) throws JsonProcessingException {
-        LoggedInUser user = new LoggedInUser(MockKeycloakConfiguration.firstUserId,
-                "firstuser",
-                "First",
-                "User",
-                Collections.emptyList());
-        String userJson = new ObjectMapper().writeValueAsString(user);
+        final String username = "firstuser";
+        final String firstName = "First";
+        final String lastName = "User";
 
-        String query = """
+        final LoggedInUser user = LoggedInUser.builder()
+                .id(MockKeycloakConfiguration.firstUserId)
+                .userName(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .courseMemberships(Collections.emptyList())
+                .realmRoles(Collections.emptySet())
+                .build();
+
+
+        final String query = """
                 query {
                     currentUserInfo {
                         id,
                         userName,
                         firstName,
-                        lastName
+                        lastName,
+                        realmRoles
                     }
                 }
                 """;
 
-        tester.mutate()
-                .headers(headers -> headers.put("CurrentUser", List.of(userJson)))
-                .build()
-                .document(query)
+        tester = addCurrentUserHeader(tester, user);
+
+        tester.document(query)
                 .execute()
                 .path("currentUserInfo.id").entity(UUID.class).isEqualTo(MockKeycloakConfiguration.firstUserId)
-                .path("currentUserInfo.userName").entity(String.class).isEqualTo("firstuser")
-                .path("currentUserInfo.firstName").entity(String.class).isEqualTo("First")
-                .path("currentUserInfo.lastName").entity(String.class).isEqualTo("User");
+                .path("currentUserInfo.userName").entity(String.class).isEqualTo(username)
+                .path("currentUserInfo.firstName").entity(String.class).isEqualTo(firstName)
+                .path("currentUserInfo.lastName").entity(String.class).isEqualTo(lastName)
+                .path("currentUserInfo.realmRoles").entityList(String.class).hasSize(0);
     }
 
     @Test
-    void testPublicUserInfoBatched(GraphQlTester tester) {
-        String query = """
+    void testCurrentUserInfoWithRealmRole(HttpGraphQlTester tester) throws JsonProcessingException {
+        final String username = "firstuser";
+        final String firstName = "First";
+        final String lastName = "User";
+
+        final LoggedInUser user = LoggedInUser.builder()
+                .id(MockKeycloakConfiguration.firstUserId)
+                .userName(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .courseMemberships(Collections.emptyList())
+                .realmRoles(Set.of(LoggedInUser.RealmRole.COURSE_CREATOR, LoggedInUser.RealmRole.SUPER_USER))
+                .build();
+
+        final String query = """
+                query {
+                    currentUserInfo {
+                        id,
+                        userName,
+                        firstName,
+                        lastName,
+                        realmRoles
+                    }
+                }
+                """;
+
+        tester = addCurrentUserHeader(tester, user);
+
+        tester.document(query)
+                .execute()
+                .path("currentUserInfo.id").entity(UUID.class).isEqualTo(MockKeycloakConfiguration.firstUserId)
+                .path("currentUserInfo.userName").entity(String.class).isEqualTo(username)
+                .path("currentUserInfo.firstName").entity(String.class).isEqualTo(firstName)
+                .path("currentUserInfo.lastName").entity(String.class).isEqualTo(lastName)
+                .path("currentUserInfo.realmRoles").entityList(String.class).hasSize(2).containsExactly(LoggedInUser.RealmRole.COURSE_CREATOR.getKeycloakRoleName(), LoggedInUser.RealmRole.SUPER_USER.getKeycloakRoleName());
+    }
+
+    @Test
+    void testPublicUserInfoBatched(final GraphQlTester tester) {
+        final String query = """
                 query($userIds: [UUID!]!) {
                     findPublicUserInfos(ids: $userIds) {
                         id,
@@ -74,7 +123,7 @@ class QueryUserTest {
     }
 
     @Test
-    void testUserInfoNonExistingUsers(GraphQlTester tester) {
+    void testUserInfoNonExistingUsers(final GraphQlTester tester) {
         String query = """
                 query($userIds: [UUID!]!) {
                     findUserInfos(ids: $userIds) {
@@ -107,8 +156,8 @@ class QueryUserTest {
     }
 
     @Test
-    void testUserInfoBatched(GraphQlTester tester) {
-        String query = """
+    void testUserInfoBatched(final GraphQlTester tester) {
+        final String query = """
                 query($userIds: [UUID!]!) {
                     findUserInfos(ids: $userIds) {
                         id,

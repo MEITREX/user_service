@@ -28,7 +28,7 @@ public class UserService {
      * @param ids List of user ids
      * @return List of (nullable) public user infos
      */
-    public List<PublicUserInfo> findPublicUserInfos(List<UUID> ids) {
+    public List<PublicUserInfo> findPublicUserInfos(final List<UUID> ids) {
         return ids.stream()
                 .map(this::findPublicUserInfo)
                 .map(optional -> optional.orElse(null))
@@ -41,7 +41,7 @@ public class UserService {
      * @param id User id
      * @return an optional of the public user info or empty if the user could not be retrieved.
      */
-    public Optional<PublicUserInfo> findPublicUserInfo(UUID id) {
+    public Optional<PublicUserInfo> findPublicUserInfo(final UUID id) {
         return findUser(id).map(user -> new PublicUserInfo(id, user.getUsername()));
     }
 
@@ -52,10 +52,10 @@ public class UserService {
      * @param ids List of user ids
      * @return List of (nullable) user infos
      */
-    public List<UserInfo> findUserInfos(List<UUID> ids, DataFetchingEnvironment env) {
+    public List<UserInfo> findUserInfos(final List<UUID> ids, final DataFetchingEnvironment env) {
         // the selection set also contains fields of children, so we first need to filter only the direct child fields
         // of the user info type
-        List<SelectedField> userInfoSubfields = env.getSelectionSet().getFields().stream()
+        final List<SelectedField> userInfoSubfields = env.getSelectionSet().getFields().stream()
                 .filter(field -> field.getObjectTypeNames().contains("UserInfo"))
                 .toList();
 
@@ -65,7 +65,7 @@ public class UserService {
                 && userInfoSubfields.get(0).getName().equals("courseMemberships")) {
             // just return a list of empty user infos, just set their id and nothing else
             return ids.stream().map(x -> {
-                UserInfo user = new UserInfo();
+                final UserInfo user = new UserInfo();
                 user.setId(x);
                 return user;
             }).toList();
@@ -83,20 +83,21 @@ public class UserService {
      * @param id User id
      * @return an optional of the user info or empty if the user could not be retrieved.
      */
-    public Optional<UserInfo> findUserInfo(UUID id) {
+    public Optional<UserInfo> findUserInfo(final UUID id) {
         return findUser(id)
                 .map(user -> new UserInfo(
                         id,
                         user.getUsername(),
                         user.getFirstName(),
-                        user.getLastName()
+                        user.getLastName(),
+                        user.getRealmRoles()
                 ));
     }
 
-    private Optional<UserRepresentation> findUser(UUID id) {
+    private Optional<UserRepresentation> findUser(final UUID id) {
         try {
             return Optional.of(keycloak.getRealm().users().get(id.toString()).toRepresentation());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             log.error("User not found", e);
             return Optional.empty();
         }
