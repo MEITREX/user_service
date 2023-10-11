@@ -21,23 +21,17 @@ public class UserController {
     private final UserService userService;
 
     @QueryMapping
-    List<PublicUserInfo> findPublicUserInfos(@Argument final List<UUID> ids) {
+    List<PublicUserInfo> findPublicUserInfos(@Argument List<UUID> ids) {
         return userService.findPublicUserInfos(ids);
     }
 
     @QueryMapping
-    public UserInfo currentUserInfo(@ContextValue final LoggedInUser currentUser) {
-        return new UserInfo(
-                currentUser.getId(),
-                currentUser.getUserName(),
-                currentUser.getFirstName(),
-                currentUser.getLastName(),
-                LoggedInUser.RealmRole.getRoleStringsFromEnum(currentUser.getRealmRoles()).stream().toList()
-        );
+    public UserInfo currentUserInfo(@ContextValue LoggedInUser currentUser) {
+        return userService.findUserInfoInHeader(currentUser);
     }
 
     @QueryMapping
-    public List<UserInfo> findUserInfos(@Argument final List<UUID> ids, final DataFetchingEnvironment env) {
+    public List<UserInfo> findUserInfos(@Argument List<UUID> ids, DataFetchingEnvironment env) {
         return userService.findUserInfos(ids, env);
     }
 }

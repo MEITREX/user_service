@@ -2,11 +2,15 @@ type PublicUserInfo {
     id: UUID!
     userName: String!
 }
+enum GlobalUserRole {
+    SUPER_USER,
+    COURSE_CREATOR
+}
 
 type UserInfo {
     id: UUID!
     userName: String!
     firstName: String!
     lastName: String!
-    realmRoles: [String!]!
+    realmRoles: [GlobalUserRole!]!
 }

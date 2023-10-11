@@ -3,6 +3,7 @@ package de.unistuttgart.iste.gits.user_service.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlTesterParameterResolver;
 import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
+import de.unistuttgart.iste.gits.generated.dto.GlobalUserRole;
 import de.unistuttgart.iste.gits.user_service.test_config.MockKeycloakConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +31,7 @@ class QueryUserTest {
         final String firstName = "First";
         final String lastName = "User";
 
-        final LoggedInUser user = LoggedInUser.builder()
+        LoggedInUser user = LoggedInUser.builder()
                 .id(MockKeycloakConfiguration.firstUserId)
                 .userName(username)
                 .firstName(firstName)
@@ -69,7 +70,7 @@ class QueryUserTest {
         final String firstName = "First";
         final String lastName = "User";
 
-        final LoggedInUser user = LoggedInUser.builder()
+        LoggedInUser user = LoggedInUser.builder()
                 .id(MockKeycloakConfiguration.firstUserId)
                 .userName(username)
                 .firstName(firstName)
@@ -98,11 +99,11 @@ class QueryUserTest {
                 .path("currentUserInfo.userName").entity(String.class).isEqualTo(username)
                 .path("currentUserInfo.firstName").entity(String.class).isEqualTo(firstName)
                 .path("currentUserInfo.lastName").entity(String.class).isEqualTo(lastName)
-                .path("currentUserInfo.realmRoles").entityList(String.class).hasSize(2).containsExactly(LoggedInUser.RealmRole.COURSE_CREATOR.getKeycloakRoleName(), LoggedInUser.RealmRole.SUPER_USER.getKeycloakRoleName());
+                .path("currentUserInfo.realmRoles").entityList(GlobalUserRole.class).hasSize(2).contains(GlobalUserRole.COURSE_CREATOR, GlobalUserRole.SUPER_USER);
     }
 
     @Test
-    void testPublicUserInfoBatched(final GraphQlTester tester) {
+    void testPublicUserInfoBatched(GraphQlTester tester) {
         final String query = """
                 query($userIds: [UUID!]!) {
                     findPublicUserInfos(ids: $userIds) {
@@ -123,7 +124,7 @@ class QueryUserTest {
     }
 
     @Test
-    void testUserInfoNonExistingUsers(final GraphQlTester tester) {
+    void testUserInfoNonExistingUsers(GraphQlTester tester) {
         String query = """
                 query($userIds: [UUID!]!) {
                     findUserInfos(ids: $userIds) {
@@ -156,7 +157,7 @@ class QueryUserTest {
     }
 
     @Test
-    void testUserInfoBatched(final GraphQlTester tester) {
+    void testUserInfoBatched(GraphQlTester tester) {
         final String query = """
                 query($userIds: [UUID!]!) {
                     findUserInfos(ids: $userIds) {
