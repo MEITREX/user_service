@@ -14,6 +14,7 @@
     * [Pagination](#pagination)
     * [StringFilter](#stringfilter)
   * [Enums](#enums)
+      * [GlobalUserRole](#globaluserrole)
     * [SortDirection](#sortdirection)
   * [Scalars](#scalars)
     * [Boolean](#boolean)
@@ -212,6 +213,11 @@ Whether there is a next page.
 <td valign="top"><a href="#string">String</a>!</td>
 <td></td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>realmRoles</strong></td>
+<td valign="top">[<a href="#globaluserrole">GlobalUserRole</a>!]!</td>
+<td></td>
+</tr>
 </tbody>
 </table>
 
@@ -392,6 +398,25 @@ If true, the filter is case-insensitive.
 </table>
 
 ## Enums
+
+### GlobalUserRole
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>SUPER_USER</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>COURSE_CREATOR</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 
 ### SortDirection
 
