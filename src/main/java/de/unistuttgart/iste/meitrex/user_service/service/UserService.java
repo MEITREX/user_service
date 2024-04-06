@@ -1,10 +1,10 @@
-package de.unistuttgart.iste.gits.user_service.service;
+package de.unistuttgart.iste.meitrex.user_service.service;
 
-import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
-import de.unistuttgart.iste.gits.generated.dto.PublicUserInfo;
-import de.unistuttgart.iste.gits.generated.dto.UserInfo;
-import de.unistuttgart.iste.gits.user_service.config.KeycloakWrapper;
-import de.unistuttgart.iste.gits.user_service.mapper.RealmMapper;
+import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
+import de.unistuttgart.iste.meitrex.generated.dto.PublicUserInfo;
+import de.unistuttgart.iste.meitrex.generated.dto.UserInfo;
+import de.unistuttgart.iste.meitrex.user_service.config.KeycloakWrapper;
+import de.unistuttgart.iste.meitrex.user_service.mapper.RealmMapper;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor

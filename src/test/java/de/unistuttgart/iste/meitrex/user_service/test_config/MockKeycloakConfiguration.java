@@ -1,6 +1,6 @@
-package de.unistuttgart.iste.gits.user_service.test_config;
+package de.unistuttgart.iste.meitrex.user_service.test_config;
 
-import de.unistuttgart.iste.gits.user_service.config.KeycloakWrapper;
+import de.unistuttgart.iste.meitrex.user_service.config.KeycloakWrapper;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.mockito.Mockito;

@@ -1,4 +1,4 @@
-package de.unistuttgart.iste.gits.user_service;
+package de.unistuttgart.iste.meitrex.user_service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
