@@ -1,4 +1,4 @@
-package de.unistuttgart.iste.gits.user_service.config;
+package de.unistuttgart.iste.meitrex.user_service.config;
 
 import de.unistuttgart.iste.meitrex.common.user_handling.RequestHeaderUserProcessor;
 import lombok.SneakyThrows;

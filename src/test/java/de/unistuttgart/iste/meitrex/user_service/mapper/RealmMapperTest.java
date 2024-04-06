@@ -1,7 +1,7 @@
-package de.unistuttgart.iste.gits.user_service.mapper;
+package de.unistuttgart.iste.meitrex.user_service.mapper;
 
-import de.unistuttgart.iste.gits.generated.dto.GlobalUserRole;
 import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
+import de.unistuttgart.iste.meitrex.generated.dto.GlobalUserRole;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 

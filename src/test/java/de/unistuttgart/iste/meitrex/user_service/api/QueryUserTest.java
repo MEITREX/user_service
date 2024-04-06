@@ -1,10 +1,10 @@
-package de.unistuttgart.iste.gits.user_service.api;
+package de.unistuttgart.iste.meitrex.user_service.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import de.unistuttgart.iste.gits.generated.dto.GlobalUserRole;
-import de.unistuttgart.iste.gits.user_service.test_config.MockKeycloakConfiguration;
 import de.unistuttgart.iste.meitrex.common.testutil.GraphQlTesterParameterResolver;
 import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
+import de.unistuttgart.iste.meitrex.generated.dto.GlobalUserRole;
+import de.unistuttgart.iste.meitrex.user_service.test_config.MockKeycloakConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
