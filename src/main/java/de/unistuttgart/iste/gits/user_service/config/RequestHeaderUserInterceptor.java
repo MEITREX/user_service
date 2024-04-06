@@ -1,6 +1,6 @@
 package de.unistuttgart.iste.gits.user_service.config;
 
-import de.unistuttgart.iste.gits.common.user_handling.RequestHeaderUserProcessor;
+import de.unistuttgart.iste.meitrex.common.user_handling.RequestHeaderUserProcessor;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.graphql.server.*;

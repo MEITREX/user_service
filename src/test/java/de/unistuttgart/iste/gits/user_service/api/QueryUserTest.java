@@ -1,10 +1,10 @@
 package de.unistuttgart.iste.gits.user_service.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import de.unistuttgart.iste.gits.common.testutil.GraphQlTesterParameterResolver;
-import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.gits.generated.dto.GlobalUserRole;
 import de.unistuttgart.iste.gits.user_service.test_config.MockKeycloakConfiguration;
+import de.unistuttgart.iste.meitrex.common.testutil.GraphQlTesterParameterResolver;
+import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,12 +12,9 @@ import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.graphql.test.tester.HttpGraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
-import static de.unistuttgart.iste.gits.common.testutil.HeaderUtils.addCurrentUserHeader;
+import static de.unistuttgart.iste.meitrex.common.testutil.HeaderUtils.addCurrentUserHeader;
 
 
 @ExtendWith(GraphQlTesterParameterResolver.class)

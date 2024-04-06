@@ -1,14 +1,12 @@
 package de.unistuttgart.iste.gits.user_service.controller;
 
-import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.gits.generated.dto.PublicUserInfo;
 import de.unistuttgart.iste.gits.generated.dto.UserInfo;
 import de.unistuttgart.iste.gits.user_service.service.UserService;
+import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
 import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
-import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.ContextValue;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.*;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;

@@ -1,13 +1,11 @@
 package de.unistuttgart.iste.gits.user_service.mapper;
 
-import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.gits.generated.dto.GlobalUserRole;
+import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class RealmMapper {
