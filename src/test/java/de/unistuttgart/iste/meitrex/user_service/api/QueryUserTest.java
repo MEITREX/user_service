@@ -1,6 +1,5 @@
 package de.unistuttgart.iste.meitrex.user_service.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.unistuttgart.iste.meitrex.common.testutil.GraphQlTesterParameterResolver;
 import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.meitrex.generated.dto.GlobalUserRole;
@@ -9,10 +8,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
-import org.springframework.graphql.test.tester.HttpGraphQlTester;
+import org.springframework.graphql.test.tester.WebGraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import static de.unistuttgart.iste.meitrex.common.testutil.HeaderUtils.addCurrentUserHeader;
 
@@ -23,7 +25,7 @@ import static de.unistuttgart.iste.meitrex.common.testutil.HeaderUtils.addCurren
 class QueryUserTest {
 
     @Test
-    void testCurrentUserInfo(HttpGraphQlTester tester) throws JsonProcessingException {
+    void testCurrentUserInfo(WebGraphQlTester tester) {
         final String username = "firstuser";
         final String firstName = "First";
         final String lastName = "User";
@@ -62,7 +64,7 @@ class QueryUserTest {
     }
 
     @Test
-    void testCurrentUserInfoWithRealmRole(HttpGraphQlTester tester) throws JsonProcessingException {
+    void testCurrentUserInfoWithRealmRole(WebGraphQlTester tester) {
         final String username = "firstuser";
         final String firstName = "First";
         final String lastName = "User";
