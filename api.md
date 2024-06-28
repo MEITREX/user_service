@@ -45,7 +45,6 @@
 <td valign="top">[<a href="#publicuserinfo">PublicUserInfo</a>]!</td>
 <td>
 
-
 Gets the publicly available information for a list of users with the specified IDs.
 If a user does not exist, null is returned for that user.
 
@@ -61,7 +60,6 @@ If a user does not exist, null is returned for that user.
 <td valign="top"><a href="#userinfo">UserInfo</a>!</td>
 <td>
 
-
 Gets the user information of the currently authorized user.
 
 </td>
@@ -70,7 +68,6 @@ Gets the user information of the currently authorized user.
 <td colspan="2" valign="top"><strong>findUserInfos</strong></td>
 <td valign="top">[<a href="#userinfo">UserInfo</a>]!</td>
 <td>
-
 
 Gets all of the users' information for a list of users with the specified IDs.
 Only available to privileged users.
@@ -90,7 +87,6 @@ If a user does not exist, null is returned for that user.
 
 ### PaginationInfo
 
-
 Return type for information about paginated results.
 
 <table>
@@ -108,7 +104,6 @@ Return type for information about paginated results.
 <td valign="top"><a href="#int">Int</a>!</td>
 <td>
 
-
 The current page number.
 
 </td>
@@ -117,7 +112,6 @@ The current page number.
 <td colspan="2" valign="top"><strong>size</strong></td>
 <td valign="top"><a href="#int">Int</a>!</td>
 <td>
-
 
 The number of elements per page.
 
@@ -128,7 +122,6 @@ The number of elements per page.
 <td valign="top"><a href="#int">Int</a>!</td>
 <td>
 
-
 The total number of elements across all pages.
 
 </td>
@@ -138,7 +131,6 @@ The total number of elements across all pages.
 <td valign="top"><a href="#int">Int</a>!</td>
 <td>
 
-
 The total number of pages.
 
 </td>
@@ -147,7 +139,6 @@ The total number of pages.
 <td colspan="2" valign="top"><strong>hasNext</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a>!</td>
 <td>
-
 
 Whether there is a next page.
 
@@ -225,7 +216,6 @@ Whether there is a next page.
 
 ### DateTimeFilter
 
-
 Filter for date values.
 If multiple filters are specified, they are combined with AND.
 
@@ -243,7 +233,6 @@ If multiple filters are specified, they are combined with AND.
 <td valign="top"><a href="#datetime">DateTime</a></td>
 <td>
 
-
 If specified, filters for dates after the specified value.
 
 </td>
@@ -253,7 +242,6 @@ If specified, filters for dates after the specified value.
 <td valign="top"><a href="#datetime">DateTime</a></td>
 <td>
 
-
 If specified, filters for dates before the specified value.
 
 </td>
@@ -262,7 +250,6 @@ If specified, filters for dates before the specified value.
 </table>
 
 ### IntFilter
-
 
 Filter for integer values.
 If multiple filters are specified, they are combined with AND.
@@ -281,7 +268,6 @@ If multiple filters are specified, they are combined with AND.
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
-
 An integer value to match exactly.
 
 </td>
@@ -290,7 +276,6 @@ An integer value to match exactly.
 <td colspan="2" valign="top"><strong>greaterThan</strong></td>
 <td valign="top"><a href="#int">Int</a></td>
 <td>
-
 
 If specified, filters for values greater than to the specified value.
 
@@ -301,7 +286,6 @@ If specified, filters for values greater than to the specified value.
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
-
 If specified, filters for values less than to the specified value.
 
 </td>
@@ -310,7 +294,6 @@ If specified, filters for values less than to the specified value.
 </table>
 
 ### Pagination
-
 
 Specifies the page size and page number for paginated results.
 
@@ -328,7 +311,6 @@ Specifies the page size and page number for paginated results.
 <td valign="top"><a href="#int">Int</a>!</td>
 <td>
 
-
 The page number, starting at 0.
 If not specified, the default value is 0.
 For values greater than 0, the page size must be specified.
@@ -341,7 +323,6 @@ If this value is larger than the number of pages, an empty page is returned.
 <td valign="top"><a href="#int">Int</a>!</td>
 <td>
 
-
 The number of elements per page.
 
 </td>
@@ -350,7 +331,6 @@ The number of elements per page.
 </table>
 
 ### StringFilter
-
 
 Filter for string values.
 If multiple filters are specified, they are combined with AND.
@@ -369,7 +349,6 @@ If multiple filters are specified, they are combined with AND.
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-
 A string value to match exactly.
 
 </td>
@@ -379,7 +358,6 @@ A string value to match exactly.
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-
 A string value that must be contained in the field that is being filtered.
 
 </td>
@@ -388,7 +366,6 @@ A string value that must be contained in the field that is being filtered.
 <td colspan="2" valign="top"><strong>ignoreCase</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a>!</td>
 <td>
-
 
 If true, the filter is case-insensitive.
 
@@ -420,7 +397,6 @@ If true, the filter is case-insensitive.
 
 ### SortDirection
 
-
 Specifies the sort direction, either ascending or descending.
 
 <table>
@@ -444,37 +420,27 @@ Specifies the sort direction, either ascending or descending.
 
 ### Boolean
 
-Built-in Boolean
+The `Boolean` scalar type represents `true` or `false`.
 
 ### Date
 
-An RFC-3339 compliant Full Date Scalar
-
 ### DateTime
-
-A slightly refined version of RFC-3339 compliant DateTime Scalar
 
 ### Int
 
-Built-in Int
+The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31)
+and 2^31 - 1.
 
 ### LocalTime
 
-24-hour clock time value string in the format `hh:mm:ss` or `hh:mm:ss.sss`.
-
 ### String
 
-Built-in String
+The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most
+often used by GraphQL to represent free-form human-readable text.
 
 ### Time
 
-An RFC-3339 compliant Full Time Scalar
-
 ### UUID
 
-A universally unique identifier compliant UUID Scalar
-
 ### Url
-
-A Url scalar
 
