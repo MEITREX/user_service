@@ -64,19 +64,18 @@ public class UserServiceClient {
             return;
         }
 
-        List<UserInfo> retrievedUserInfos = null;
+        List<UserInfo> retrievedUserInfos;
         try {
             retrievedUserInfos = result.field(queryName).toEntityList(UserInfo.class);
         } catch (FieldAccessException e) {
             sink.error(new UserServiceConnectionException(e.toString()));
-        }
-
-        if (retrievedUserInfos == null) {
-            sink.error(new UserServiceConnectionException("Error fetching userInfo from UserService: Missing field in response."));
             return;
         }
+
+        // retrievedUserInfos == null is always false, therefore no check
         if (retrievedUserInfos.isEmpty()) {
-            sink.error(new UserServiceConnectionException("Error fetching userInfo from UserService: Field in response is empty."));
+            sink.error(new UserServiceConnectionException("Error fetching userInfo from UserService: UserInfo List is empty."));
+            return;
         }
 
         sink.next(retrievedUserInfos);
