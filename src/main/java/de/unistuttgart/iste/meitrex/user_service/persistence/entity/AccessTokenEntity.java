@@ -54,6 +54,6 @@ public class AccessTokenEntity {
     @Column(nullable = false)
     private OffsetDateTime accessTokenExpiresAt;
 
-    @Column(updatable = false)
+    @Column
     private OffsetDateTime refreshTokenExpiresAt;
 }
