@@ -11,7 +11,6 @@ import de.unistuttgart.iste.meitrex.user_service.config.ExternalServiceProviderC
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.AccessTokenEntity;
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.ExternalServiceProvider;
 import de.unistuttgart.iste.meitrex.user_service.persistence.repository.AccessTokenRepository;
-import de.unistuttgart.iste.meitrex.user_service.persistence.validation.AccessTokenValidator;
 import de.unistuttgart.iste.meitrex.user_service.service.dto.AccessTokenResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -44,8 +43,6 @@ public class AccessTokenService {
 
     private final ExternalServiceProviderConfiguration providersConfig;
 
-    private final AccessTokenValidator accessTokenValidator;
-
     private final ModelMapper modelMapper;
 
     /**
@@ -56,7 +53,6 @@ public class AccessTokenService {
      * @return {@code true} if a valid token exists, otherwise {@code false}.
      */
     public Boolean isAccessTokenAvailable(LoggedInUser currentUser, ExternalServiceProviderDto providerDto) {
-        accessTokenValidator.validateProviderDto(providerDto);
         final ExternalServiceProvider provider = modelMapper.map(providerDto, ExternalServiceProvider.class);
 
         final UserInfo currentUserInfo = userService.findUserInfoInHeader(currentUser);
@@ -88,7 +84,6 @@ public class AccessTokenService {
      * @throws EntityNotFoundException if no valid token is found.
      */
     public String getAccessToken(LoggedInUser currentUser, ExternalServiceProviderDto providerDto) {
-        accessTokenValidator.validateProviderDto(providerDto);
         final ExternalServiceProvider provider = modelMapper.map(providerDto, ExternalServiceProvider.class);
 
         final UserInfo currentUserInfo = userService.findUserInfoInHeader(currentUser);
@@ -173,7 +168,6 @@ public class AccessTokenService {
      * @return {@code true} if the access token was successfully generated and stored, otherwise {@code false}.
      */
     public Boolean generateAccessToken(LoggedInUser currentUser, GenerateAccessTokenInput input) {
-        accessTokenValidator.validateGenerateAccessTokenInput(input);
         final ExternalServiceProvider provider = modelMapper.map(input.getProvider(), ExternalServiceProvider.class);
         final UserInfo currentUserInfo = userService.findUserInfoInHeader(currentUser);
 
