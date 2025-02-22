@@ -1,0 +1,18 @@
+type Mutation {
+    """
+    Generates an access token for the given provider using an authorization code obtained from the OAuth flow.
+    This should be called **only after** the user completes authorization and the frontend retrieves the auth code.
+    After the access token is generated, the user is redirected to the redirect URI.
+    """
+    generateAccessToken(input: GenerateAccessTokenInput!): Boolean!
+}
+
+input GenerateAccessTokenInput {
+    provider: ExternalServiceProviderDto!
+    authorizationCode: String!
+    redirectUri: String!
+}
+
+enum ExternalServiceProviderDto {
+    GITHUB
+}
