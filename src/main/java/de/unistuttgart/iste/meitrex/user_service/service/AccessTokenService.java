@@ -11,7 +11,7 @@ import de.unistuttgart.iste.meitrex.user_service.config.ExternalServiceProviderC
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.AccessTokenEntity;
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.ExternalServiceProvider;
 import de.unistuttgart.iste.meitrex.user_service.persistence.repository.AccessTokenRepository;
-import de.unistuttgart.iste.meitrex.user_service.service.dto.AccessTokenResponse;
+import de.unistuttgart.iste.meitrex.user_service.util.AccessTokenResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

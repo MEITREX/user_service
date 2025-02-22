@@ -1,4 +1,4 @@
-package de.unistuttgart.iste.meitrex.user_service.service.dto;
+package de.unistuttgart.iste.meitrex.user_service.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
