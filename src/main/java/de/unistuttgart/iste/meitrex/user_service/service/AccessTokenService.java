@@ -119,7 +119,7 @@ public class AccessTokenService {
                     "&refresh_token=" + accessToken.getRefreshToken();
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(providerInfo.getRefreshTokenUrl()))
+                    .uri(URI.create(providerInfo.getTokenRequestUrl()))
                     .header("Accept", "application/json")
                     .header("Content-Type", "application/x-www-form-urlencoded")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
@@ -214,9 +214,9 @@ public class AccessTokenService {
 
         if (response.statusCode() == 200) {
             return parseTokenResponse(response.body());
-        } else {
-            log.error("Failed to exchange code for access token. HTTP Status: {} Response: {}", response.statusCode(), response.body());
-            throw new RuntimeException("Failed to exchange authorization code for access token. HTTP Status: " + response.statusCode());
         }
+
+        log.error("Failed to exchange code for access token. HTTP Status: {} Response: {}", response.statusCode(), response.body());
+        return null;
     }
 }
