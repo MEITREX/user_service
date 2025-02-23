@@ -3,8 +3,6 @@ package de.unistuttgart.iste.meitrex.user_service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 
 import java.util.Arrays;
 
@@ -13,7 +11,7 @@ import java.util.Arrays;
  * <p>
  *
  */
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
+@SpringBootApplication
 @Slf4j
 public class UserServiceApplication {
 
