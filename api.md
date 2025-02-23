@@ -4,17 +4,20 @@
   <summary><strong>Table of Contents</strong></summary>
 
   * [Query](#query)
+  * [Mutation](#mutation)
   * [Objects](#objects)
     * [PaginationInfo](#paginationinfo)
     * [PublicUserInfo](#publicuserinfo)
     * [UserInfo](#userinfo)
   * [Inputs](#inputs)
     * [DateTimeFilter](#datetimefilter)
+    * [GenerateAccessTokenInput](#generateaccesstokeninput)
     * [IntFilter](#intfilter)
     * [Pagination](#pagination)
     * [StringFilter](#stringfilter)
   * [Enums](#enums)
-      * [GlobalUserRole](#globaluserrole)
+    * [ExternalServiceProviderDto](#externalserviceproviderdto)
+    * [GlobalUserRole](#globaluserrole)
     * [SortDirection](#sortdirection)
   * [Scalars](#scalars)
     * [Boolean](#boolean)
@@ -41,7 +44,7 @@
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>findPublicUserInfos</strong></td>
+<td colspan="2" valign="top"><strong id="query.findpublicuserinfos">findPublicUserInfos</strong></td>
 <td valign="top">[<a href="#publicuserinfo">PublicUserInfo</a>]!</td>
 <td>
 
@@ -56,7 +59,7 @@ If a user does not exist, null is returned for that user.
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>currentUserInfo</strong></td>
+<td colspan="2" valign="top"><strong id="query.currentuserinfo">currentUserInfo</strong></td>
 <td valign="top"><a href="#userinfo">UserInfo</a>!</td>
 <td>
 
@@ -65,7 +68,7 @@ Gets the user information of the currently authorized user.
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>findUserInfos</strong></td>
+<td colspan="2" valign="top"><strong id="query.finduserinfos">findUserInfos</strong></td>
 <td valign="top">[<a href="#userinfo">UserInfo</a>]!</td>
 <td>
 
@@ -78,6 +81,72 @@ If a user does not exist, null is returned for that user.
 <tr>
 <td colspan="2" align="right" valign="top">ids</td>
 <td valign="top">[<a href="#uuid">UUID</a>!]!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="query.isaccesstokenavailable">isAccessTokenAvailable</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+Checks whether an access token for a given third-party provider exists and is still valid for the currently authenticated user.
+Returns `true` if:
+- The access token exists and is not expired, OR
+- The refresh token exists and is not expired.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">provider</td>
+<td valign="top"><a href="#externalserviceproviderdto">ExternalServiceProviderDto</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="query._internal_getaccesstoken">_internal_getAccessToken</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Retrieves the access token of the currently authenticated user for a specified third-party provider.
+
+- If the access token is expired but a valid refresh token is available, the system will attempt to generate a new access token.
+- Throws an exception if neither a valid access token nor a valid refresh token is available.
+
+⚠️ This query is **only accessible internally** and allows the caller to retrieve their own access token. ⚠️
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">provider</td>
+<td valign="top"><a href="#externalserviceproviderdto">ExternalServiceProviderDto</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+## Mutation
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong id="mutation.generateaccesstoken">generateAccessToken</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+Generates an access token for the given provider using an authorization code obtained from the OAuth flow.
+This should be called **only after** the user completes authorization and the frontend retrieves the auth code.
+After the access token is generated, the user is redirected to the redirect URI.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#generateaccesstokeninput">GenerateAccessTokenInput</a>!</td>
 <td></td>
 </tr>
 </tbody>
@@ -100,7 +169,7 @@ Return type for information about paginated results.
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>page</strong></td>
+<td colspan="2" valign="top"><strong id="paginationinfo.page">page</strong></td>
 <td valign="top"><a href="#int">Int</a>!</td>
 <td>
 
@@ -109,7 +178,7 @@ The current page number.
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>size</strong></td>
+<td colspan="2" valign="top"><strong id="paginationinfo.size">size</strong></td>
 <td valign="top"><a href="#int">Int</a>!</td>
 <td>
 
@@ -118,7 +187,7 @@ The number of elements per page.
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>totalElements</strong></td>
+<td colspan="2" valign="top"><strong id="paginationinfo.totalelements">totalElements</strong></td>
 <td valign="top"><a href="#int">Int</a>!</td>
 <td>
 
@@ -127,7 +196,7 @@ The total number of elements across all pages.
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>totalPages</strong></td>
+<td colspan="2" valign="top"><strong id="paginationinfo.totalpages">totalPages</strong></td>
 <td valign="top"><a href="#int">Int</a>!</td>
 <td>
 
@@ -136,7 +205,7 @@ The total number of pages.
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>hasNext</strong></td>
+<td colspan="2" valign="top"><strong id="paginationinfo.hasnext">hasNext</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a>!</td>
 <td>
 
@@ -160,12 +229,12 @@ Whether there is a next page.
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>id</strong></td>
+<td colspan="2" valign="top"><strong id="publicuserinfo.id">id</strong></td>
 <td valign="top"><a href="#uuid">UUID</a>!</td>
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>userName</strong></td>
+<td colspan="2" valign="top"><strong id="publicuserinfo.username">userName</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
 <td></td>
 </tr>
@@ -185,27 +254,27 @@ Whether there is a next page.
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>id</strong></td>
+<td colspan="2" valign="top"><strong id="userinfo.id">id</strong></td>
 <td valign="top"><a href="#uuid">UUID</a>!</td>
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>userName</strong></td>
+<td colspan="2" valign="top"><strong id="userinfo.username">userName</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>firstName</strong></td>
+<td colspan="2" valign="top"><strong id="userinfo.firstname">firstName</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>lastName</strong></td>
+<td colspan="2" valign="top"><strong id="userinfo.lastname">lastName</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>realmRoles</strong></td>
+<td colspan="2" valign="top"><strong id="userinfo.realmroles">realmRoles</strong></td>
 <td valign="top">[<a href="#globaluserrole">GlobalUserRole</a>!]!</td>
 <td></td>
 </tr>
@@ -229,7 +298,7 @@ If multiple filters are specified, they are combined with AND.
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>after</strong></td>
+<td colspan="2" valign="top"><strong id="datetimefilter.after">after</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a></td>
 <td>
 
@@ -238,13 +307,42 @@ If specified, filters for dates after the specified value.
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>before</strong></td>
+<td colspan="2" valign="top"><strong id="datetimefilter.before">before</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a></td>
 <td>
 
 If specified, filters for dates before the specified value.
 
 </td>
+</tr>
+</tbody>
+</table>
+
+### GenerateAccessTokenInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong id="generateaccesstokeninput.provider">provider</strong></td>
+<td valign="top"><a href="#externalserviceproviderdto">ExternalServiceProviderDto</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="generateaccesstokeninput.authorizationcode">authorizationCode</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="generateaccesstokeninput.redirecturi">redirectUri</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -264,7 +362,7 @@ If multiple filters are specified, they are combined with AND.
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>equals</strong></td>
+<td colspan="2" valign="top"><strong id="intfilter.equals">equals</strong></td>
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
@@ -273,7 +371,7 @@ An integer value to match exactly.
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>greaterThan</strong></td>
+<td colspan="2" valign="top"><strong id="intfilter.greaterthan">greaterThan</strong></td>
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
@@ -282,7 +380,7 @@ If specified, filters for values greater than to the specified value.
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>lessThan</strong></td>
+<td colspan="2" valign="top"><strong id="intfilter.lessthan">lessThan</strong></td>
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
@@ -307,7 +405,7 @@ Specifies the page size and page number for paginated results.
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>page</strong></td>
+<td colspan="2" valign="top"><strong id="pagination.page">page</strong></td>
 <td valign="top"><a href="#int">Int</a>!</td>
 <td>
 
@@ -319,7 +417,7 @@ If this value is larger than the number of pages, an empty page is returned.
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>size</strong></td>
+<td colspan="2" valign="top"><strong id="pagination.size">size</strong></td>
 <td valign="top"><a href="#int">Int</a>!</td>
 <td>
 
@@ -345,7 +443,7 @@ If multiple filters are specified, they are combined with AND.
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>equals</strong></td>
+<td colspan="2" valign="top"><strong id="stringfilter.equals">equals</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
@@ -354,7 +452,7 @@ A string value to match exactly.
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>contains</strong></td>
+<td colspan="2" valign="top"><strong id="stringfilter.contains">contains</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
@@ -363,7 +461,7 @@ A string value that must be contained in the field that is being filtered.
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>ignoreCase</strong></td>
+<td colspan="2" valign="top"><strong id="stringfilter.ignorecase">ignoreCase</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a>!</td>
 <td>
 
@@ -376,12 +474,31 @@ If true, the filter is case-insensitive.
 
 ## Enums
 
+### ExternalServiceProviderDto
+
+<table>
+<thead>
+<tr>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>GITHUB</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### GlobalUserRole
 
 <table>
 <thead>
+<tr>
 <th align="left">Value</th>
 <th align="left">Description</th>
+</tr>
 </thead>
 <tbody>
 <tr>
@@ -401,8 +518,10 @@ Specifies the sort direction, either ascending or descending.
 
 <table>
 <thead>
+<tr>
 <th align="left">Value</th>
 <th align="left">Description</th>
+</tr>
 </thead>
 <tbody>
 <tr>
@@ -428,15 +547,13 @@ The `Boolean` scalar type represents `true` or `false`.
 
 ### Int
 
-The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31)
-and 2^31 - 1.
+The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
 
 ### LocalTime
 
 ### String
 
-The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most
-often used by GraphQL to represent free-form human-readable text.
+The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
 
 ### Time
 
