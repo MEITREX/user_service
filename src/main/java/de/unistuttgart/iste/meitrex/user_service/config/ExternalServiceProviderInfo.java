@@ -19,7 +19,5 @@ public class ExternalServiceProviderInfo {
 
     @NonNull
     private final String tokenRequestUrl;
-
-    private final String refreshTokenUrl;
 }
 
