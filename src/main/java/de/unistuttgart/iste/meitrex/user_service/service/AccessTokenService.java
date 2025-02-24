@@ -6,8 +6,8 @@ import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.meitrex.generated.dto.ExternalServiceProviderDto;
 import de.unistuttgart.iste.meitrex.generated.dto.GenerateAccessTokenInput;
 import de.unistuttgart.iste.meitrex.generated.dto.UserInfo;
-import de.unistuttgart.iste.meitrex.user_service.config.ExternalServiceProviderInfo;
-import de.unistuttgart.iste.meitrex.user_service.config.ExternalServiceProviderConfiguration;
+import de.unistuttgart.iste.meitrex.user_service.config.access_token.ExternalServiceProviderInfo;
+import de.unistuttgart.iste.meitrex.user_service.config.access_token.ExternalServiceProviderConfiguration;
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.AccessTokenEntity;
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.ExternalServiceProvider;
 import de.unistuttgart.iste.meitrex.user_service.persistence.repository.AccessTokenRepository;
@@ -45,6 +45,8 @@ public class AccessTokenService {
 
     private final ModelMapper modelMapper;
 
+    private final HttpClient client;
+
     /**
      * Checks if a valid access token or refresh token is available for a given user and provider.
      *
@@ -65,13 +67,13 @@ public class AccessTokenService {
         AccessTokenEntity accessToken = accessTokenOptional.get();
         OffsetDateTime now = OffsetDateTime.now();
 
-        if (accessToken.getAccessTokenExpiresAt().isAfter(now)) {
+        // Access tokens can be non-expiring
+        if (accessToken.getAccessTokenExpiresAt() == null || accessToken.getAccessTokenExpiresAt().isAfter(now)) {
             return true;
         }
 
         // If access token expired, check if the refresh token is expired
-        return accessToken.getRefreshToken() != null &&
-                accessToken.getRefreshTokenExpiresAt().isAfter(now);
+        return accessToken.getRefreshTokenExpiresAt().isAfter(now);
     }
 
     /**
@@ -96,14 +98,12 @@ public class AccessTokenService {
         AccessTokenEntity accessToken = accessTokenOptional.get();
         OffsetDateTime now = OffsetDateTime.now();
 
-        if (accessToken.getAccessTokenExpiresAt().isAfter(now)) {
+        if (accessToken.getAccessTokenExpiresAt() == null || accessToken.getAccessTokenExpiresAt().isAfter(now)) {
             return accessToken.getAccessToken();
         }
 
-        boolean isRefreshTokenValid = accessToken.getRefreshToken() != null && accessToken.getRefreshTokenExpiresAt().isAfter(now);
-
-        if (!isRefreshTokenValid) {
-            throw new EntityNotFoundException("Access token expired and refresh token expired/not available  for user " + currentUserInfo.getId() + " and provider " + provider);
+        if (!accessToken.getRefreshTokenExpiresAt().isAfter(now)) {
+            throw new EntityNotFoundException("Access token expired and refresh token expired for user " + currentUserInfo.getId() + " and provider " + provider);
         }
 
         return refreshAccessToken(accessToken, provider);
@@ -125,7 +125,6 @@ public class AccessTokenService {
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
-            HttpClient client = HttpClient.newHttpClient();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
@@ -140,12 +139,14 @@ public class AccessTokenService {
 
                 return tokenResponse.getAccessToken();
             } else {
-                throw new RuntimeException("Failed to refresh access token. HTTP Status: " + response.statusCode());
+                log.error("Failed to refresh access token. HTTP Status: " + response.statusCode());
             }
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("Error while refreshing access token", e);
+            log.error("Failed to refresh access token for user {} and provider {}", accessToken.getUserId(), provider, e);
         }
+        return null;
     }
+
 
     private AccessTokenResponse parseTokenResponse(String responseBody) {
         JsonObject jsonResponse = JsonParser.parseString(responseBody).getAsJsonObject();
@@ -209,7 +210,6 @@ public class AccessTokenService {
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
 
-        HttpClient client = HttpClient.newHttpClient();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 200) {
