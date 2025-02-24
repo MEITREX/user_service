@@ -3,7 +3,7 @@ package de.unistuttgart.iste.meitrex.user_service.service;
 import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.meitrex.generated.dto.PublicUserInfo;
 import de.unistuttgart.iste.meitrex.generated.dto.UserInfo;
-import de.unistuttgart.iste.meitrex.user_service.config.KeycloakWrapper;
+import de.unistuttgart.iste.meitrex.user_service.config.user.KeycloakWrapper;
 import de.unistuttgart.iste.meitrex.user_service.mapper.RealmMapper;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;

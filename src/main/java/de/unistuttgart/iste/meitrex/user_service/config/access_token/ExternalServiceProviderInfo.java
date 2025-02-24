@@ -1,4 +1,4 @@
-package de.unistuttgart.iste.meitrex.user_service.config;
+package de.unistuttgart.iste.meitrex.user_service.config.access_token;
 
 import lombok.Builder;
 import lombok.Data;
