@@ -2,6 +2,7 @@ package de.unistuttgart.iste.meitrex.user_service.service;
 
 import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.meitrex.generated.dto.ExternalServiceProviderDto;
+import de.unistuttgart.iste.meitrex.generated.dto.GenerateAccessTokenInput;
 import de.unistuttgart.iste.meitrex.generated.dto.UserInfo;
 import de.unistuttgart.iste.meitrex.user_service.config.access_token.ExternalServiceProviderInfo;
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.AccessTokenEntity;
@@ -155,19 +156,29 @@ class AccessTokenServiceTest {
 
         when(accessTokenRepository.findByUserIdAndProvider(any(), any())).thenReturn(Optional.of(validAccessToken));
 
-        ExternalServiceProviderInfo mockProviderInfo = mock(ExternalServiceProviderInfo.class);
-        when(mockProviderInfo.getClientId()).thenReturn("mockClientId");
-        when(mockProviderInfo.getClientSecret()).thenReturn("mockClientSecret");
-        when(mockProviderInfo.getTokenRequestUrl()).thenReturn("https://mock.token.url");
+        when(modelMapper.map(ExternalServiceProviderDto.GITHUB, ExternalServiceProvider.class))
+                .thenReturn(ExternalServiceProvider.GITHUB);
 
-        Map<ExternalServiceProvider, ExternalServiceProviderInfo> mockProvidersMap =
-                Map.of(ExternalServiceProvider.GITHUB, mockProviderInfo);
-        when(providersConfig.getProviders()).thenReturn(mockProvidersMap);
+        ExternalServiceProviderInfo providerInfo = mock(ExternalServiceProviderInfo.class);
+        when(providerInfo.getClientId()).thenReturn("clientId");
+        when(providerInfo.getClientSecret()).thenReturn("clientSecret");
+        when(providerInfo.getTokenRequestUrl()).thenReturn("https://token.url");
 
-        String mockResponseBody = "{\"access_token\":\"new_valid_access_token\", \"expires_in\":3600, \"refresh_token\":\"new_refresh_token\", \"refresh_token_expires_in\":7200}";
+        Map<ExternalServiceProvider, ExternalServiceProviderInfo> providersMap =
+                Map.of(ExternalServiceProvider.GITHUB, providerInfo);
+        when(providersConfig.getProviders()).thenReturn(providersMap);
+
+        String responseBody = """
+        {
+            "access_token": "new_valid_access_token",
+            "expires_in": 28800,
+            "refresh_token": "refresh_token_value",
+            "refresh_token_expires_in": 15897600
+        }
+        """;
         HttpResponse<String> mockHttpResponse = mock(HttpResponse.class);
         when(mockHttpResponse.statusCode()).thenReturn(200);
-        when(mockHttpResponse.body()).thenReturn(mockResponseBody);
+        when(mockHttpResponse.body()).thenReturn(responseBody);
 
         HttpClient mockHttpClient = mock(HttpClient.class);
         when(mockHttpClient.send(any(HttpRequest.class), eq(HttpResponse.BodyHandlers.ofString()))).thenReturn(mockHttpResponse);
@@ -177,7 +188,6 @@ class AccessTokenServiceTest {
         String result = accessTokenService.getAccessToken(loggedInUser, providerDto);
 
         assertThat(result, equalTo("new_valid_access_token"));
-
         verify(accessTokenRepository, times(1)).save(any(AccessTokenEntity.class));
     }
 
@@ -194,9 +204,61 @@ class AccessTokenServiceTest {
         });
     }
 
-    // Test for generateAccessToken
     @Test
-    void testGenerateAccessToken_Success() {
-        assertNull("");
+    void testGenerateAccessToken_Success() throws Exception {
+        GenerateAccessTokenInput input = new GenerateAccessTokenInput();
+        input.setAuthorizationCode("mockCode");
+        input.setRedirectUri("https://mock.redirect.uri");
+        input.setProvider(ExternalServiceProviderDto.GITHUB);
+
+        UserInfo mockUserInfo = mock(UserInfo.class);
+        when(userService.findUserInfoInHeader(loggedInUser)).thenReturn(mockUserInfo);
+        UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+        when(mockUserInfo.getId()).thenReturn(userId);
+
+        when(modelMapper.map(ExternalServiceProviderDto.GITHUB, ExternalServiceProvider.class))
+                .thenReturn(ExternalServiceProvider.GITHUB);
+
+        ExternalServiceProviderInfo providerInfo = mock(ExternalServiceProviderInfo.class);
+        when(providerInfo.getClientId()).thenReturn("clientId");
+        when(providerInfo.getClientSecret()).thenReturn("clientSecret");
+        when(providerInfo.getTokenRequestUrl()).thenReturn("https://mock.token.url");
+
+        Map<ExternalServiceProvider, ExternalServiceProviderInfo> providersMap =
+                Map.of(ExternalServiceProvider.GITHUB, providerInfo);
+        when(providersConfig.getProviders()).thenReturn(providersMap);
+
+        String responseBody = """
+        {
+            "access_token": "generated_access_token",
+            "expires_in": 28800,
+            "refresh_token": "refresh_token",
+            "refresh_token_expires_in": 15897600
+        }
+        """;
+        HttpResponse<String> mockHttpResponse = mock(HttpResponse.class);
+        when(mockHttpResponse.statusCode()).thenReturn(200);
+        when(mockHttpResponse.body()).thenReturn(responseBody);
+
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockHttpClient.send(any(HttpRequest.class), eq(HttpResponse.BodyHandlers.ofString())))
+                .thenReturn(mockHttpResponse);
+
+        accessTokenService = new AccessTokenService(
+                userService, accessTokenRepository, providersConfig, modelMapper, mockHttpClient);
+
+        boolean result = accessTokenService.generateAccessToken(loggedInUser, input);
+        assertTrue(result);
+
+        ArgumentCaptor<AccessTokenEntity> captor = ArgumentCaptor.forClass(AccessTokenEntity.class);
+        verify(accessTokenRepository, times(1)).save(captor.capture());
+
+        AccessTokenEntity savedEntity = captor.getValue();
+        assertThat(savedEntity.getUserId(), is(userId));
+        assertThat(savedEntity.getProvider(), is(ExternalServiceProvider.GITHUB));
+        assertThat(savedEntity.getAccessToken(), is("generated_access_token"));
+        assertThat(savedEntity.getRefreshToken(), is("refresh_token"));
     }
+
+
 }
