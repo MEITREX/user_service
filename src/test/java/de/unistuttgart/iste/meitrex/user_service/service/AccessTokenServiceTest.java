@@ -147,6 +147,7 @@ class AccessTokenServiceTest {
         assertThat(result, equalTo("valid_access_token"));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void testGetAccessToken_ExpiredToken_ValidRefreshToken() throws Exception {
         validAccessToken.setAccessToken("expired_access_token");
@@ -204,6 +205,7 @@ class AccessTokenServiceTest {
         });
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void testGenerateAccessToken_Success() throws Exception {
         GenerateAccessTokenInput input = new GenerateAccessTokenInput();
@@ -259,6 +261,4 @@ class AccessTokenServiceTest {
         assertThat(savedEntity.getAccessToken(), is("generated_access_token"));
         assertThat(savedEntity.getRefreshToken(), is("refresh_token"));
     }
-
-
 }
