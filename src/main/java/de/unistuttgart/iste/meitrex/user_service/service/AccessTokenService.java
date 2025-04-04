@@ -11,9 +11,8 @@ import de.unistuttgart.iste.meitrex.user_service.config.access_token.ExternalSer
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.AccessTokenEntity;
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.ExternalServiceProvider;
 import de.unistuttgart.iste.meitrex.user_service.persistence.repository.AccessTokenRepository;
-import de.unistuttgart.iste.meitrex.user_service.util.AccessTokenResponse;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -218,5 +217,20 @@ public class AccessTokenService {
 
         log.error("Failed to exchange code for access token. HTTP Status: {} Response: {}", response.statusCode(), response.body());
         return null;
+    }
+
+    /**
+     * DTO representing an OAuth2 access token response.
+     * Used to encapsulate token details received from an external service provider.
+     */
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AccessTokenResponse {
+        private String accessToken;
+        private Integer expiresIn;
+        private String refreshToken;
+        private Integer refreshTokenExpiresIn;
     }
 }
