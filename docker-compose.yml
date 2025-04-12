@@ -5,7 +5,7 @@ services:
     build:
       context: ./../user_service # necessary because otherwise docker-compose overrides the context path when merging multiple docker-compose.yml files
       dockerfile: Dockerfile
-    restart: always
+    restart: unless-stopped
     container_name: user_service
     expose:
       - 5000
