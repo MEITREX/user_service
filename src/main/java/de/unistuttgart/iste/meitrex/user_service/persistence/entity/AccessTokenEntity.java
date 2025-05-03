@@ -30,6 +30,9 @@ public class AccessTokenEntity {
     @Column(nullable = false)
     private ExternalServiceProvider provider;
 
+    // Used to query repositories and grades of the user from external code assessment provider
+    private String externalUserId;
+
     /**
      * The access token used for authentication with the external service provider.
      * <p>

@@ -2,6 +2,7 @@ package de.unistuttgart.iste.meitrex.user_service.api;
 
 import de.unistuttgart.iste.meitrex.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
+import de.unistuttgart.iste.meitrex.generated.dto.AccessToken;
 import de.unistuttgart.iste.meitrex.generated.dto.ExternalServiceProviderDto;
 import de.unistuttgart.iste.meitrex.generated.dto.GenerateAccessTokenInput;
 import de.unistuttgart.iste.meitrex.user_service.service.AccessTokenService;
@@ -62,20 +63,21 @@ class QueryAccessTokenTest {
     void testInternalGetAccessToken(WebGraphQlTester tester) {
         String token = "mocked-access-token";
         when(accessTokenService.getAccessToken(any(), eq(ExternalServiceProviderDto.GITHUB)))
-                .thenReturn(token);
+                .thenReturn(new AccessToken(token, null));
 
         String query = """
-            query($provider: ExternalServiceProviderDto!) {
-                _internal_getAccessToken(provider: $provider)
+            query($currentUserId: UUID!, $provider: ExternalServiceProviderDto!) {
+                _internal_getAccessToken(currentUserId: $currentUserId, provider: $provider) {
+                    accessToken
+                }
             }
         """;
 
-        tester = addCurrentUserHeader(tester, user);
-
         tester.document(query)
+                .variable("currentUserId", user.getId())
                 .variable("provider", ExternalServiceProviderDto.GITHUB)
                 .execute()
-                .path("_internal_getAccessToken")
+                .path("_internal_getAccessToken.accessToken")
                 .entity(String.class)
                 .isEqualTo(token);
     }
@@ -94,7 +96,6 @@ class QueryAccessTokenTest {
         GenerateAccessTokenInput input = new GenerateAccessTokenInput();
         input.setProvider(ExternalServiceProviderDto.GITHUB);
         input.setAuthorizationCode("mockCode");
-        input.setRedirectUri("https://mock.url");
 
         tester = addCurrentUserHeader(tester, user);
 

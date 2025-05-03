@@ -1,6 +1,7 @@
 package de.unistuttgart.iste.meitrex.user_service.service;
 
 import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
+import de.unistuttgart.iste.meitrex.generated.dto.AccessToken;
 import de.unistuttgart.iste.meitrex.generated.dto.ExternalServiceProviderDto;
 import de.unistuttgart.iste.meitrex.generated.dto.GenerateAccessTokenInput;
 import de.unistuttgart.iste.meitrex.generated.dto.UserInfo;
@@ -54,10 +55,17 @@ class AccessTokenServiceTest {
     void setup() {
         MockitoAnnotations.openMocks(this);
 
+        UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+        when(loggedInUser.getId()).thenReturn(userId);
+
         UserInfo userInfo = mock(UserInfo.class);
+        when(userInfo.getId()).thenReturn(userId);
+
+        when(userService.findUserInfo(userId)).thenReturn(Optional.of(userInfo));
         when(userService.findUserInfoInHeader(loggedInUser)).thenReturn(userInfo);
-        when(userInfo.getId()).thenReturn(UUID.fromString("00000000-0000-0000-0000-000000000000"));
     }
+
+
 
     @Test
     void testIsAccessTokenAvailable_NoTokenFound() {
@@ -121,7 +129,7 @@ class AccessTokenServiceTest {
         when(accessTokenRepository.findByUserIdAndProvider(any(), any())).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> {
-            accessTokenService.getAccessToken(loggedInUser, providerDto);
+            accessTokenService.getAccessToken(loggedInUser.getId(), providerDto);
         });
     }
 
@@ -131,9 +139,9 @@ class AccessTokenServiceTest {
         validAccessToken.setAccessTokenExpiresAt(null);
         when(accessTokenRepository.findByUserIdAndProvider(any(), any())).thenReturn(Optional.of(validAccessToken));
 
-        String result = accessTokenService.getAccessToken(loggedInUser, providerDto);
+        AccessToken result = accessTokenService.getAccessToken(loggedInUser.getId(), providerDto);
 
-        assertThat(result, equalTo("valid_access_token"));
+        assertThat(result.getAccessToken(), equalTo("valid_access_token"));
     }
 
     @Test
@@ -142,9 +150,9 @@ class AccessTokenServiceTest {
         validAccessToken.setAccessTokenExpiresAt(OffsetDateTime.now().plusMinutes(5));
         when(accessTokenRepository.findByUserIdAndProvider(any(), any())).thenReturn(Optional.of(validAccessToken));
 
-        String result = accessTokenService.getAccessToken(loggedInUser, providerDto);
+        AccessToken result = accessTokenService.getAccessToken(loggedInUser.getId(), providerDto);
 
-        assertThat(result, equalTo("valid_access_token"));
+        assertThat(result.getAccessToken(), equalTo("valid_access_token"));
     }
 
     @SuppressWarnings("unchecked")
@@ -186,9 +194,9 @@ class AccessTokenServiceTest {
 
         accessTokenService = new AccessTokenService(userService, accessTokenRepository, providersConfig, modelMapper, mockHttpClient);
 
-        String result = accessTokenService.getAccessToken(loggedInUser, providerDto);
+        AccessToken result = accessTokenService.getAccessToken(loggedInUser.getId(), providerDto);
 
-        assertThat(result, equalTo("new_valid_access_token"));
+        assertThat(result.getAccessToken(), equalTo("new_valid_access_token"));
         verify(accessTokenRepository, times(1)).save(any(AccessTokenEntity.class));
     }
 
@@ -201,7 +209,7 @@ class AccessTokenServiceTest {
         when(accessTokenRepository.findByUserIdAndProvider(any(), any())).thenReturn(Optional.of(validAccessToken));
 
         assertThrows(EntityNotFoundException.class, () -> {
-            accessTokenService.getAccessToken(loggedInUser, providerDto);
+            accessTokenService.getAccessToken(loggedInUser.getId(), providerDto);
         });
     }
 
@@ -210,13 +218,7 @@ class AccessTokenServiceTest {
     void testGenerateAccessToken_Success() throws Exception {
         GenerateAccessTokenInput input = new GenerateAccessTokenInput();
         input.setAuthorizationCode("mockCode");
-        input.setRedirectUri("https://mock.redirect.uri");
         input.setProvider(ExternalServiceProviderDto.GITHUB);
-
-        UserInfo mockUserInfo = mock(UserInfo.class);
-        when(userService.findUserInfoInHeader(loggedInUser)).thenReturn(mockUserInfo);
-        UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000000");
-        when(mockUserInfo.getId()).thenReturn(userId);
 
         when(modelMapper.map(ExternalServiceProviderDto.GITHUB, ExternalServiceProvider.class))
                 .thenReturn(ExternalServiceProvider.GITHUB);
@@ -244,7 +246,22 @@ class AccessTokenServiceTest {
 
         HttpClient mockHttpClient = mock(HttpClient.class);
         when(mockHttpClient.send(any(HttpRequest.class), eq(HttpResponse.BodyHandlers.ofString())))
-                .thenReturn(mockHttpResponse);
+                .thenAnswer(invocation -> {
+                    HttpRequest request = invocation.getArgument(0);
+                    if (request.uri().toString().equals("https://api.github.com/user")) {
+                        HttpResponse<String> userInfoResponse = mock(HttpResponse.class);
+                        when(userInfoResponse.statusCode()).thenReturn(200);
+                        when(userInfoResponse.body()).thenReturn("""
+                {
+                    "login": "mocked-username"
+                }
+            """);
+                        return userInfoResponse;
+                    } else {
+                        return mockHttpResponse; // your token response
+                    }
+                });
+
 
         accessTokenService = new AccessTokenService(
                 userService, accessTokenRepository, providersConfig, modelMapper, mockHttpClient);
@@ -256,7 +273,7 @@ class AccessTokenServiceTest {
         verify(accessTokenRepository, times(1)).save(captor.capture());
 
         AccessTokenEntity savedEntity = captor.getValue();
-        assertThat(savedEntity.getUserId(), is(userId));
+        assertThat(savedEntity.getUserId(), is(loggedInUser.getId()));
         assertThat(savedEntity.getProvider(), is(ExternalServiceProvider.GITHUB));
         assertThat(savedEntity.getAccessToken(), is("generated_access_token"));
         assertThat(savedEntity.getRefreshToken(), is("refresh_token"));

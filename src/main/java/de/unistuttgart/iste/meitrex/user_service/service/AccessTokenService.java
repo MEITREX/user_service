@@ -3,16 +3,15 @@ package de.unistuttgart.iste.meitrex.user_service.service;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
-import de.unistuttgart.iste.meitrex.generated.dto.ExternalServiceProviderDto;
-import de.unistuttgart.iste.meitrex.generated.dto.GenerateAccessTokenInput;
-import de.unistuttgart.iste.meitrex.generated.dto.UserInfo;
+import de.unistuttgart.iste.meitrex.generated.dto.*;
 import de.unistuttgart.iste.meitrex.user_service.config.access_token.ExternalServiceProviderInfo;
 import de.unistuttgart.iste.meitrex.user_service.config.access_token.ExternalServiceProviderConfiguration;
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.AccessTokenEntity;
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.ExternalServiceProvider;
 import de.unistuttgart.iste.meitrex.user_service.persistence.repository.AccessTokenRepository;
+import de.unistuttgart.iste.meitrex.user_service.config.access_token.AccessTokenResponse;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 
 /**
@@ -53,7 +55,7 @@ public class AccessTokenService {
      * @param providerDto the external service provider name.
      * @return {@code true} if a valid token exists, otherwise {@code false}.
      */
-    public Boolean isAccessTokenAvailable(LoggedInUser currentUser, ExternalServiceProviderDto providerDto) {
+    public boolean isAccessTokenAvailable(LoggedInUser currentUser, ExternalServiceProviderDto providerDto) {
         final ExternalServiceProvider provider = modelMapper.map(providerDto, ExternalServiceProvider.class);
 
         final UserInfo currentUserInfo = userService.findUserInfoInHeader(currentUser);
@@ -79,15 +81,15 @@ public class AccessTokenService {
      * Retrieves the access token for a given user and provider.
      * If the token is expired and a valid refresh token exists, the token is refreshed.
      *
-     * @param currentUser the currently logged-in user.
-     * @param providerDto the external service provider name.
+     * @param currentUserId ID of currently logged-in user.
+     * @param providerDto   the external service provider name.
      * @return the active access token.
      * @throws EntityNotFoundException if no valid token is found.
      */
-    public String getAccessToken(LoggedInUser currentUser, ExternalServiceProviderDto providerDto) {
+    public AccessToken getAccessToken(UUID currentUserId, ExternalServiceProviderDto providerDto) {
         final ExternalServiceProvider provider = modelMapper.map(providerDto, ExternalServiceProvider.class);
 
-        final UserInfo currentUserInfo = userService.findUserInfoInHeader(currentUser);
+        final UserInfo currentUserInfo = userService.findUserInfo(currentUserId).orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + currentUserId));
         final Optional<AccessTokenEntity> accessTokenOptional = accessTokenRepository.findByUserIdAndProvider(currentUserInfo.getId(), provider);
 
         if (accessTokenOptional.isEmpty()) {
@@ -98,7 +100,7 @@ public class AccessTokenService {
         OffsetDateTime now = OffsetDateTime.now();
 
         if (accessToken.getAccessTokenExpiresAt() == null || accessToken.getAccessTokenExpiresAt().isAfter(now)) {
-            return accessToken.getAccessToken();
+            return new AccessToken(accessToken.getAccessToken(), accessToken.getExternalUserId());
         }
 
         if (!accessToken.getRefreshTokenExpiresAt().isAfter(now)) {
@@ -108,7 +110,7 @@ public class AccessTokenService {
         return refreshAccessToken(accessToken, provider);
     }
 
-    private String refreshAccessToken(AccessTokenEntity accessToken, ExternalServiceProvider provider) {
+    private AccessToken refreshAccessToken(AccessTokenEntity accessToken, ExternalServiceProvider provider) {
         try {
             ExternalServiceProviderInfo providerInfo = providersConfig.getProviders().get(provider);
 
@@ -136,7 +138,7 @@ public class AccessTokenService {
 
                 accessTokenRepository.save(accessToken);
 
-                return tokenResponse.getAccessToken();
+                return new AccessToken(accessToken.getAccessToken(), accessToken.getExternalUserId());
             } else {
                 log.error("Failed to refresh access token. HTTP Status: " + response.statusCode());
             }
@@ -164,20 +166,23 @@ public class AccessTokenService {
      * This method exchanges an authorization code for an access token and stores it in the database.
      *
      * @param currentUser the currently logged-in user.
-     * @param input       the input containing the authorization code, provider, and redirect URI.
+     * @param input       the input containing the authorization code and provider.
      * @return {@code true} if the access token was successfully generated and stored, otherwise {@code false}.
      */
-    public Boolean generateAccessToken(LoggedInUser currentUser, GenerateAccessTokenInput input) {
+    public boolean generateAccessToken(LoggedInUser currentUser, GenerateAccessTokenInput input) {
         final ExternalServiceProvider provider = modelMapper.map(input.getProvider(), ExternalServiceProvider.class);
         final UserInfo currentUserInfo = userService.findUserInfoInHeader(currentUser);
 
         try {
-            AccessTokenResponse tokenResponse = exchangeCodeForAccessToken(provider, input.getAuthorizationCode(), input.getRedirectUri());
+            AccessTokenResponse tokenResponse = exchangeCodeForAccessToken(provider, input.getAuthorizationCode());
 
             if (tokenResponse != null && tokenResponse.getAccessToken() != null) {
+                String externalUserId = this.tryGetExternalUserId(tokenResponse.getAccessToken(), provider);
+
                 AccessTokenEntity accessTokenEntity = AccessTokenEntity.builder()
                         .userId(currentUserInfo.getId())
                         .provider(provider)
+                        .externalUserId(externalUserId)
                         .accessToken(tokenResponse.getAccessToken())
                         .accessTokenExpiresAt(OffsetDateTime.now().plusSeconds(tokenResponse.getExpiresIn()))
                         .refreshToken(tokenResponse.getRefreshToken())
@@ -194,13 +199,12 @@ public class AccessTokenService {
         return false;
     }
 
-    private AccessTokenResponse exchangeCodeForAccessToken(ExternalServiceProvider provider, String code, String redirectUri) throws IOException, InterruptedException {
+    private AccessTokenResponse exchangeCodeForAccessToken(ExternalServiceProvider provider, String code) throws IOException, InterruptedException {
         ExternalServiceProviderInfo providerInfo = providersConfig.getProviders().get(provider);
 
         String requestBody = "client_id=" + providerInfo.getClientId() +
                 "&client_secret=" + providerInfo.getClientSecret() +
-                "&code=" + code +
-                "&redirect_uri=" + redirectUri;
+                "&code=" + code;
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(providerInfo.getTokenRequestUrl()))
@@ -219,18 +223,45 @@ public class AccessTokenService {
         return null;
     }
 
-    /**
-     * DTO representing an OAuth2 access token response.
-     * Used to encapsulate token details received from an external service provider.
-     */
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class AccessTokenResponse {
-        private String accessToken;
-        private Integer expiresIn;
-        private String refreshToken;
-        private Integer refreshTokenExpiresIn;
+    private String tryGetExternalUserId(String accessToken, ExternalServiceProvider provider) {
+        if (provider != ExternalServiceProvider.GITHUB) {
+            return null;
+        }
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.github.com/user"))
+                .header("Accept", "application/vnd.github+json")
+                .header("Authorization", "Bearer " + accessToken)
+                .header("X-GitHub-Api-Version", "2022-11-28")
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                JsonObject user = JsonParser.parseString(response.body()).getAsJsonObject();
+                String username = user.get("login").getAsString();
+                return username;
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        return null;
+    }
+
+    public List<ExternalUserIdWithUser> getExternalUserIds(ExternalServiceProviderDto providerDto, List<UUID> userIds) {
+        final ExternalServiceProvider provider = modelMapper.map(providerDto, ExternalServiceProvider.class);
+
+        final List<ExternalUserIdWithUser> externalUserIds = new ArrayList<>();
+        for (UUID userId : userIds) {
+            final Optional<AccessTokenEntity> accessTokenOptional = accessTokenRepository.findByUserIdAndProvider(userId, provider);
+            if (accessTokenOptional.isPresent()) {
+                AccessTokenEntity accessToken = accessTokenOptional.get();
+                externalUserIds.add(new ExternalUserIdWithUser(userId, accessToken.getExternalUserId()));
+            }
+        }
+        return externalUserIds;
     }
 }
