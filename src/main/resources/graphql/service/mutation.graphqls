@@ -10,7 +10,6 @@ type Mutation {
 input GenerateAccessTokenInput {
     provider: ExternalServiceProviderDto!
     authorizationCode: String!
-    redirectUri: String!
 }
 
 enum ExternalServiceProviderDto {
