@@ -33,6 +33,7 @@ services:
     expose:
       - "6379"
 volumes:
+  dbdata:
   userdata:
   testdata:
 networks:
