@@ -1,0 +1,29 @@
+enum Gamification {
+    GAMIFICATION_ENABLED,
+    ADAPTIVE_GAMIFICATION_ENABLED,
+    ALL_GAMIFICATION_DISABLED
+}
+
+input NotificationInput {
+    gamification: Boolean!
+    lecture: Boolean!
+}
+
+type Notification {
+    gamification: Boolean!,
+    lecture: Boolean!,
+}
+
+input SettingsInput {
+    gamification: Gamification,
+    notification: NotificationInput
+}
+
+type Settings {
+    gamification: Gamification,
+    notification: Notification,
+}
+
+type Mutation {
+    saveSettings(userId: UUID!, input: SettingsInput!): Settings!
+}
