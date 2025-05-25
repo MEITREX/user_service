@@ -5,8 +5,8 @@ enum Gamification {
 }
 
 input NotificationInput {
-    gamification: Boolean!
-    lecture: Boolean!
+    gamification: Boolean
+    lecture: Boolean
 }
 
 type Notification {
@@ -25,5 +25,6 @@ type Settings {
 }
 
 type Mutation {
-    saveSettings(userId: UUID!, input: SettingsInput!): Settings!
+    updateSettings(userId: UUID!, input: SettingsInput!): Settings!
+    defaultSettings(userId: UUID!): Settings!
 }
