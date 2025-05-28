@@ -7,6 +7,8 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
+
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -24,10 +26,15 @@ public class SettingsController {
         return settingsService.find(userId);
     }
 
-    // Set default settings
+    @QueryMapping
+    public List<Settings> findUsersSettings(@Argument List<UUID> usersIds) {
+        return settingsService.findAll(usersIds);
+    }
+
     @MutationMapping
     public Settings defaultSettings(@Argument UUID userId){
         return settingsService.setDefault(userId);
     }
+
 
 }

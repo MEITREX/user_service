@@ -10,8 +10,8 @@ input NotificationInput {
 }
 
 type Notification {
-    gamification: Boolean!,
-    lecture: Boolean!,
+    gamification: Boolean,
+    lecture: Boolean,
 }
 
 input SettingsInput {

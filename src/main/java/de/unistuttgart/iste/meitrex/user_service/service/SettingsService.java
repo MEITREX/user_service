@@ -11,8 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,16 +51,29 @@ public class SettingsService {
     }
 
      /**
-     * Return settings of user
+     * Return settings of user and if no settings available set default settings
      * @param userId
      * @return user settings
      */
-    public Settings find(UUID userId) {
-        Optional<SettingsEntity> optional = settingsRepository.findByUserId(userId);
-        return optional.map(settingsMapper::entityToDto).orElse(null);
+     public Settings find(UUID userId) {
+         return settingsRepository.findByUserId(userId)
+             .map(settingsMapper::entityToDto)
+             .orElseGet(() -> setDefault(userId));
+     }
+
+    /**
+     * Return settings of userss
+     * @param usersIds
+     * @return users settings
+     */
+    public List<Settings> findAll(List<UUID> usersIds) {
+        return settingsRepository.findAllByUserIdIn(usersIds).stream()
+                .map(settingsMapper::entityToDto)
+                .collect(Collectors.toList());
     }
 
-     /**
+
+    /**
      * Set user settings to default to default settings
      * @param userId
      * @return default user settings
