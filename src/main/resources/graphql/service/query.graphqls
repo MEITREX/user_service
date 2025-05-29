@@ -14,4 +14,9 @@ type Query {
     If a user does not exist, null is returned for that user.
     """
     findUserInfos(ids: [UUID!]!): [UserInfo]!
+
+    findUserSettings(userId: UUID): Settings!
+
+    findUsersSettings(usersIds: [UUID]!): [Settings]!
+    
 }

@@ -13,7 +13,7 @@ import java.util.Arrays;
  * <p>
  *
  */
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
+@SpringBootApplication
 @Slf4j
 public class UserServiceApplication {
 
