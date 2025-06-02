@@ -15,8 +15,5 @@ type Query {
     """
     findUserInfos(ids: [UUID!]!): [UserInfo]!
 
-    findUserSettings(userId: UUID): Settings!
-
-    findUsersSettings(usersIds: [UUID]!): [Settings]!
-    
+    findUserSettings(userId: UUID!): Settings!
 }
