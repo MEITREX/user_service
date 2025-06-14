@@ -25,7 +25,7 @@ services:
       - 5000
       - 5001
     ports:
-      - "5000:5000"
+      - "5002:5000"
       - "5001:5001"
     depends_on:
       - database
