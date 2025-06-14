@@ -143,6 +143,7 @@ public class AccessTokenService {
                 log.error("Failed to refresh access token. HTTP Status: " + response.statusCode());
             }
         } catch (IOException | InterruptedException e) {
+            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
             log.error("Failed to refresh access token for user {} and provider {}", accessToken.getUserId(), provider, e);
         }
         return null;
@@ -193,10 +194,10 @@ public class AccessTokenService {
                 accessTokenRepository.save(accessTokenEntity);
                 return tokenResponse.getAccessToken() != null;
             }
-        } catch (Exception e) {
+        } catch (IOException | InterruptedException e) {
+            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
             log.error("Failed to generate access token for user {} and provider {}", currentUserInfo.getId(), provider, e);
         }
-
         return false;
     }
 
@@ -222,7 +223,7 @@ public class AccessTokenService {
         return null;
     }
 
-    private String tryGetExternalUserId(String accessToken, ExternalServiceProviderInfo providerInfo) {
+    private String tryGetExternalUserId(String accessToken, ExternalServiceProviderInfo providerInfo) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(providerInfo.getExternalUserIdUrl()))
                 .header("Accept", "application/vnd.github+json")
@@ -230,17 +231,11 @@ public class AccessTokenService {
                 .header("X-GitHub-Api-Version", "2022-11-28")
                 .GET()
                 .build();
+         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200) {
-                JsonObject user = JsonParser.parseString(response.body()).getAsJsonObject();
-                return user.get("login").getAsString();
-            }
-        } catch (Exception e) {
-            // throw to avoid saving a token without external user ID
-            throw new RuntimeException(e);
+        if (response.statusCode() == 200) {
+            JsonObject user = JsonParser.parseString(response.body()).getAsJsonObject();
+            return user.get("login").getAsString();
         }
 
         return null;
