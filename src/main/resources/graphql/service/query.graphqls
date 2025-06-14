@@ -35,6 +35,7 @@ type Query {
     """
     Retrieves the external user IDs for a list of users with the specified IDs.
     If a user does not exist, null is returned for that user.
+    If the user does not have an external user ID for the specified provider, null is returned for that user.
     ⚠️ This query is **only accessible internally** and the caller must be at least a tutor of a course. The permission must be validated by the caller method. ⚠️
     """
     _internal_getExternalUserIds(userIds: [UUID!]!, provider: ExternalServiceProviderDto): [ExternalUserIdWithUser!]!

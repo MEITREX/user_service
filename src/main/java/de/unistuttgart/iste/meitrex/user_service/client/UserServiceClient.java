@@ -159,11 +159,7 @@ public class UserServiceClient {
 
                         try {
                             List<ExternalUserIdWithUser> list = result.field(queryName).toEntityList(ExternalUserIdWithUser.class);
-                            if (list.isEmpty()) {
-                                sink.error(new UserServiceConnectionException("ExternalUserIdWithUser list is empty or null."));
-                            } else {
-                                sink.next(list);
-                            }
+                            sink.next(list);
                         } catch (FieldAccessException e) {
                             sink.error(new UserServiceConnectionException("Failed to extract userId-externalId map: " + e.getMessage()));
                         }
