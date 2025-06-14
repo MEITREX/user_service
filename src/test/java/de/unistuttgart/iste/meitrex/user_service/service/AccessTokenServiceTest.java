@@ -2,11 +2,13 @@ package de.unistuttgart.iste.meitrex.user_service.service;
 
 import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.meitrex.generated.dto.*;
+import de.unistuttgart.iste.meitrex.user_service.config.access_token.AccessTokenResponse;
 import de.unistuttgart.iste.meitrex.user_service.config.access_token.ExternalServiceProviderInfo;
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.AccessTokenEntity;
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.ExternalServiceProvider;
 import de.unistuttgart.iste.meitrex.user_service.persistence.repository.AccessTokenRepository;
 import de.unistuttgart.iste.meitrex.user_service.config.access_token.ExternalServiceProviderConfiguration;
+import de.unistuttgart.iste.meitrex.user_service.service.oauth.ExternalOAuthClient;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,9 @@ class AccessTokenServiceTest {
 
     @Mock
     private ModelMapper modelMapper;
+
+    @Mock
+    private ExternalOAuthClient externalOAuthClient;
 
     @InjectMocks
     private AccessTokenService accessTokenService;
@@ -155,51 +160,6 @@ class AccessTokenServiceTest {
         assertThat(result.getAccessToken(), equalTo("valid_access_token"));
     }
 
-    @SuppressWarnings("unchecked")
-    @Test
-    void testGetAccessToken_ExpiredToken_ValidRefreshToken() throws Exception {
-        validAccessToken.setAccessToken("expired_access_token");
-        validAccessToken.setAccessTokenExpiresAt(OffsetDateTime.now().minusMinutes(5));
-        validAccessToken.setRefreshToken("refresh_token");
-        validAccessToken.setRefreshTokenExpiresAt(OffsetDateTime.now().plusMinutes(5));
-
-        when(accessTokenRepository.findByUserIdAndProvider(any(), any())).thenReturn(Optional.of(validAccessToken));
-
-        when(modelMapper.map(ExternalServiceProviderDto.GITHUB, ExternalServiceProvider.class))
-                .thenReturn(ExternalServiceProvider.GITHUB);
-
-        ExternalServiceProviderInfo providerInfo = mock(ExternalServiceProviderInfo.class);
-        when(providerInfo.getClientId()).thenReturn("clientId");
-        when(providerInfo.getClientSecret()).thenReturn("clientSecret");
-        when(providerInfo.getTokenRequestUrl()).thenReturn("https://token.url");
-
-        Map<ExternalServiceProvider, ExternalServiceProviderInfo> providersMap =
-                Map.of(ExternalServiceProvider.GITHUB, providerInfo);
-        when(providersConfig.getProviders()).thenReturn(providersMap);
-
-        String responseBody = """
-        {
-            "access_token": "new_valid_access_token",
-            "expires_in": 28800,
-            "refresh_token": "refresh_token_value",
-            "refresh_token_expires_in": 15897600
-        }
-        """;
-        HttpResponse<String> mockHttpResponse = mock(HttpResponse.class);
-        when(mockHttpResponse.statusCode()).thenReturn(200);
-        when(mockHttpResponse.body()).thenReturn(responseBody);
-
-        HttpClient mockHttpClient = mock(HttpClient.class);
-        when(mockHttpClient.send(any(HttpRequest.class), eq(HttpResponse.BodyHandlers.ofString()))).thenReturn(mockHttpResponse);
-
-        accessTokenService = new AccessTokenService(userService, accessTokenRepository, providersConfig, modelMapper, mockHttpClient);
-
-        AccessToken result = accessTokenService.getAccessToken(loggedInUser.getId(), providerDto);
-
-        assertThat(result.getAccessToken(), equalTo("new_valid_access_token"));
-        verify(accessTokenRepository, times(1)).save(any(AccessTokenEntity.class));
-    }
-
     @Test
     void testGetAccessToken_ExpiredToken_ExpiredRefreshToken() {
         validAccessToken.setAccessToken("valid_access_token");
@@ -213,6 +173,36 @@ class AccessTokenServiceTest {
         assertThrows(EntityNotFoundException.class, () -> {
             accessTokenService.getAccessToken(userId, providerDto);
         });
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void testGetAccessToken_ExpiredToken_ValidRefreshToken() throws Exception {
+        validAccessToken.setAccessToken("expired_access_token");
+        validAccessToken.setAccessTokenExpiresAt(OffsetDateTime.now().minusMinutes(5));
+        validAccessToken.setRefreshToken("refresh_token");
+        validAccessToken.setRefreshTokenExpiresAt(OffsetDateTime.now().plusMinutes(5));
+
+        when(accessTokenRepository.findByUserIdAndProvider(any(), any())).thenReturn(Optional.of(validAccessToken));
+
+        when(modelMapper.map(ExternalServiceProviderDto.GITHUB, ExternalServiceProvider.class))
+                .thenReturn(ExternalServiceProvider.GITHUB);
+
+        AccessTokenResponse tokenResponse = new AccessTokenResponse("new_valid_access_token", 28800, "refresh_token", 15897600);
+        when(externalOAuthClient.refreshAccessToken(any(), any()))
+                .thenReturn(tokenResponse);
+
+        accessTokenService = new AccessTokenService(
+                userService,
+                accessTokenRepository,
+                modelMapper,
+                externalOAuthClient
+        );
+
+        AccessToken result = accessTokenService.getAccessToken(loggedInUser.getId(), providerDto);
+
+        assertThat(result.getAccessToken(), equalTo("new_valid_access_token"));
+        verify(accessTokenRepository, times(1)).save(any(AccessTokenEntity.class));
     }
 
     @SuppressWarnings("unchecked")
@@ -235,39 +225,19 @@ class AccessTokenServiceTest {
                 Map.of(ExternalServiceProvider.GITHUB, providerInfo);
         when(providersConfig.getProviders()).thenReturn(providersMap);
 
-        String responseBody = """
-        {
-            "access_token": "generated_access_token",
-            "expires_in": 28800,
-            "refresh_token": "refresh_token",
-            "refresh_token_expires_in": 15897600
-        }
-        """;
-        HttpResponse<String> mockHttpResponse = mock(HttpResponse.class);
-        when(mockHttpResponse.statusCode()).thenReturn(200);
-        when(mockHttpResponse.body()).thenReturn(responseBody);
+        AccessTokenResponse tokenResponse = new AccessTokenResponse("generated_access_token", 28800, "refresh_token", 15897600);
+        when(externalOAuthClient.exchangeCodeForAccessToken(any(), any()))
+                .thenReturn(tokenResponse);
 
-        HttpClient mockHttpClient = mock(HttpClient.class);
-        when(mockHttpClient.send(any(HttpRequest.class), eq(HttpResponse.BodyHandlers.ofString())))
-                .thenAnswer(invocation -> {
-                    HttpRequest request = invocation.getArgument(0);
-                    if (request.uri().toString().equals("https://api.github.com/user")) {
-                        HttpResponse<String> userInfoResponse = mock(HttpResponse.class);
-                        when(userInfoResponse.statusCode()).thenReturn(200);
-                        when(userInfoResponse.body()).thenReturn("""
-                {
-                    "login": "mocked-username"
-                }
-            """);
-                        return userInfoResponse;
-                    } else {
-                        return mockHttpResponse; // your token response
-                    }
-                });
-
+        when(externalOAuthClient.fetchExternalUserId(any(), any()))
+                .thenReturn("external_user_id");
 
         accessTokenService = new AccessTokenService(
-                userService, accessTokenRepository, providersConfig, modelMapper, mockHttpClient);
+                userService,
+                accessTokenRepository,
+                modelMapper,
+                externalOAuthClient
+        );
 
         boolean result = accessTokenService.generateAccessToken(loggedInUser, input);
         assertTrue(result);
@@ -280,6 +250,7 @@ class AccessTokenServiceTest {
         assertThat(savedEntity.getProvider(), is(ExternalServiceProvider.GITHUB));
         assertThat(savedEntity.getAccessToken(), is("generated_access_token"));
         assertThat(savedEntity.getRefreshToken(), is("refresh_token"));
+        assertThat(savedEntity.getExternalUserId(), is("external_user_id"));
     }
 
     @Test
@@ -287,7 +258,7 @@ class AccessTokenServiceTest {
         // Given
         UUID userId1 = UUID.randomUUID();
         UUID userId2 = UUID.randomUUID();
-        UUID userId3 = UUID.randomUUID(); // this user will not have a token
+        UUID noTokenUserId = UUID.randomUUID();
 
         AccessTokenEntity token1 = new AccessTokenEntity();
         token1.setUserId(userId1);
@@ -304,12 +275,12 @@ class AccessTokenServiceTest {
                 .thenReturn(Optional.of(token1));
         when(accessTokenRepository.findByUserIdAndProvider(userId2, ExternalServiceProvider.GITHUB))
                 .thenReturn(Optional.of(token2));
-        when(accessTokenRepository.findByUserIdAndProvider(userId3, ExternalServiceProvider.GITHUB))
+        when(accessTokenRepository.findByUserIdAndProvider(noTokenUserId, ExternalServiceProvider.GITHUB))
                 .thenReturn(Optional.empty());
 
         List<ExternalUserIdWithUser> result = accessTokenService.getExternalUserIds(
                 ExternalServiceProviderDto.GITHUB,
-                List.of(userId1, userId2, userId3)
+                List.of(userId1, userId2, noTokenUserId)
         );
 
         assertThat(result, hasSize(2));

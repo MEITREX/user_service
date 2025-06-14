@@ -10,6 +10,8 @@ import de.unistuttgart.iste.meitrex.user_service.persistence.entity.AccessTokenE
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.ExternalServiceProvider;
 import de.unistuttgart.iste.meitrex.user_service.persistence.repository.AccessTokenRepository;
 import de.unistuttgart.iste.meitrex.user_service.config.access_token.AccessTokenResponse;
+import de.unistuttgart.iste.meitrex.user_service.service.oauth.ExternalOAuthClient;
+import de.unistuttgart.iste.meitrex.user_service.service.oauth.ExternalOAuthStrategy;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,11 +44,9 @@ public class AccessTokenService {
 
     private final AccessTokenRepository accessTokenRepository;
 
-    private final ExternalServiceProviderConfiguration providersConfig;
-
     private final ModelMapper modelMapper;
 
-    private final HttpClient client;
+    private final ExternalOAuthClient externalOAuthClient;
 
     /**
      * Checks if a valid access token or refresh token is available for a given user and provider.
@@ -112,54 +112,25 @@ public class AccessTokenService {
 
     private AccessToken refreshAccessToken(AccessTokenEntity accessToken, ExternalServiceProvider provider) {
         try {
-            ExternalServiceProviderInfo providerInfo = providersConfig.getProviders().get(provider);
+            AccessTokenResponse tokenResponse = externalOAuthClient.refreshAccessToken(accessToken.getRefreshToken(), provider);
 
-            String requestBody = "client_id=" + providerInfo.getClientId() +
-                    "&client_secret=" + providerInfo.getClientSecret() +
-                    "&grant_type=refresh_token" +
-                    "&refresh_token=" + accessToken.getRefreshToken();
-
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(providerInfo.getTokenRequestUrl()))
-                    .header("Accept", "application/json")
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                    .build();
-
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200) {
-                AccessTokenResponse tokenResponse = parseTokenResponse(response.body());
-
-                accessToken.setAccessToken(tokenResponse.getAccessToken());
-                accessToken.setAccessTokenExpiresAt(OffsetDateTime.now().plusSeconds(tokenResponse.getExpiresIn()));
-                accessToken.setRefreshToken(tokenResponse.getRefreshToken());
-                accessToken.setRefreshTokenExpiresAt(OffsetDateTime.now().plusSeconds(tokenResponse.getRefreshTokenExpiresIn()));
-
-                accessTokenRepository.save(accessToken);
-
-                return new AccessToken(accessToken.getAccessToken(), accessToken.getExternalUserId());
-            } else {
-                log.error("Failed to refresh access token. HTTP Status: " + response.statusCode());
+            if (tokenResponse == null || tokenResponse.getAccessToken() == null) {
+                log.error("Failed to refresh access token for user {} and provider {}", accessToken.getUserId(), provider);
+                return null;
             }
+
+            accessToken.setAccessToken(tokenResponse.getAccessToken());
+            accessToken.setAccessTokenExpiresAt(OffsetDateTime.now().plusSeconds(tokenResponse.getExpiresIn()));
+            accessToken.setRefreshToken(tokenResponse.getRefreshToken());
+            accessToken.setRefreshTokenExpiresAt(OffsetDateTime.now().plusSeconds(tokenResponse.getRefreshTokenExpiresIn()));
+
+            accessTokenRepository.save(accessToken);
+            return new AccessToken(accessToken.getAccessToken(), accessToken.getExternalUserId());
         } catch (IOException | InterruptedException e) {
             if (e instanceof InterruptedException) Thread.currentThread().interrupt();
             log.error("Failed to refresh access token for user {} and provider {}", accessToken.getUserId(), provider, e);
         }
         return null;
-    }
-
-
-    private AccessTokenResponse parseTokenResponse(String responseBody) {
-        JsonObject jsonResponse = JsonParser.parseString(responseBody).getAsJsonObject();
-
-        // If access token is non-expiring, there are no expires_in, refresh_token, or refresh_token_expires_in fields in the response body
-        return AccessTokenResponse.builder()
-                .accessToken(jsonResponse.get("access_token").getAsString())
-                .expiresIn(jsonResponse.has("expires_in") ? jsonResponse.get("expires_in").getAsInt() : null)
-                .refreshToken(jsonResponse.has("refresh_token") ? jsonResponse.get("refresh_token").getAsString() : null)
-                .refreshTokenExpiresIn(jsonResponse.has("refresh_token_expires_in") ? jsonResponse.get("refresh_token_expires_in").getAsInt() : null)
-                .build();
     }
 
     /**
@@ -173,13 +144,12 @@ public class AccessTokenService {
     public boolean generateAccessToken(LoggedInUser currentUser, GenerateAccessTokenInput input) {
         final ExternalServiceProvider provider = modelMapper.map(input.getProvider(), ExternalServiceProvider.class);
         final UserInfo currentUserInfo = userService.findUserInfoInHeader(currentUser);
-        final ExternalServiceProviderInfo providerInfo = providersConfig.getProviders().get(provider);
 
         try {
-            AccessTokenResponse tokenResponse = exchangeCodeForAccessToken(input.getAuthorizationCode(), providerInfo);
+            AccessTokenResponse tokenResponse = externalOAuthClient.exchangeCodeForAccessToken(input.getAuthorizationCode(), provider);
 
             if (tokenResponse != null && tokenResponse.getAccessToken() != null) {
-                String externalUserId = this.tryGetExternalUserId(tokenResponse.getAccessToken(), providerInfo);
+                String externalUserId = externalOAuthClient.fetchExternalUserId(tokenResponse.getAccessToken(), provider);
 
                 AccessTokenEntity accessTokenEntity = AccessTokenEntity.builder()
                         .userId(currentUserInfo.getId())
@@ -199,46 +169,6 @@ public class AccessTokenService {
             log.error("Failed to generate access token for user {} and provider {}", currentUserInfo.getId(), provider, e);
         }
         return false;
-    }
-
-    private AccessTokenResponse exchangeCodeForAccessToken(String code, ExternalServiceProviderInfo providerInfo) throws IOException, InterruptedException {
-        String requestBody = "client_id=" + providerInfo.getClientId() +
-                "&client_secret=" + providerInfo.getClientSecret() +
-                "&code=" + code;
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(providerInfo.getTokenRequestUrl()))
-                .header("Accept", "application/json")
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() == 200) {
-            return parseTokenResponse(response.body());
-        }
-
-        log.error("Failed to exchange code for access token. HTTP Status: {} Response: {}", response.statusCode(), response.body());
-        return null;
-    }
-
-    private String tryGetExternalUserId(String accessToken, ExternalServiceProviderInfo providerInfo) throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(providerInfo.getExternalUserIdUrl()))
-                .header("Accept", "application/vnd.github+json")
-                .header("Authorization", "Bearer " + accessToken)
-                .header("X-GitHub-Api-Version", "2022-11-28")
-                .GET()
-                .build();
-         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() == 200) {
-            JsonObject user = JsonParser.parseString(response.body()).getAsJsonObject();
-            return user.get("login").getAsString();
-        }
-
-        return null;
     }
 
     public List<ExternalUserIdWithUser> getExternalUserIds(ExternalServiceProviderDto providerDto, List<UUID> userIds) {
