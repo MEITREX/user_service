@@ -159,7 +159,7 @@ public class UserServiceClient {
 
                         try {
                             List<ExternalUserIdWithUser> list = result.field(queryName).toEntityList(ExternalUserIdWithUser.class);
-                            if (list == null || list.isEmpty()) {
+                            if (list.isEmpty()) {
                                 sink.error(new UserServiceConnectionException("ExternalUserIdWithUser list is empty or null."));
                             } else {
                                 sink.next(list);
@@ -172,7 +172,7 @@ public class UserServiceClient {
                     .block();
         } catch (RuntimeException e) {
             unwrapUserServiceConnectionException(e);
-            return null;
+            return List.of();
         }
     }
 

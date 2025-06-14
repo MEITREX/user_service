@@ -47,7 +47,7 @@ class AccessTokenServiceTest {
 
     private final LoggedInUser loggedInUser = mock(LoggedInUser.class);
     private final ExternalServiceProviderDto providerDto = ExternalServiceProviderDto.GITHUB;
-    private final AccessTokenEntity validAccessToken = new AccessTokenEntity();;
+    private final AccessTokenEntity validAccessToken = new AccessTokenEntity();
 
     @BeforeEach
     void setup() {
@@ -126,8 +126,10 @@ class AccessTokenServiceTest {
     void testGetAccessToken_NoTokenFound() {
         when(accessTokenRepository.findByUserIdAndProvider(any(), any())).thenReturn(Optional.empty());
 
+        UUID userId = loggedInUser.getId();
+
         assertThrows(EntityNotFoundException.class, () -> {
-            accessTokenService.getAccessToken(loggedInUser.getId(), providerDto);
+            accessTokenService.getAccessToken(userId, providerDto);
         });
     }
 
@@ -206,8 +208,10 @@ class AccessTokenServiceTest {
         validAccessToken.setRefreshTokenExpiresAt(OffsetDateTime.now().minusMinutes(5));
         when(accessTokenRepository.findByUserIdAndProvider(any(), any())).thenReturn(Optional.of(validAccessToken));
 
+        UUID userId = loggedInUser.getId();
+
         assertThrows(EntityNotFoundException.class, () -> {
-            accessTokenService.getAccessToken(loggedInUser.getId(), providerDto);
+            accessTokenService.getAccessToken(userId, providerDto);
         });
     }
 

@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(GraphQlTesterParameterResolver.class)
 @SpringBootTest({"spring.main.allow-bean-definition-overriding=true"})
 @ContextConfiguration(classes = MockKeycloakConfiguration.class)
-public class UserServiceClientTest {
+class UserServiceClientTest {
 
     private GraphQlClient graphQlClient;
 

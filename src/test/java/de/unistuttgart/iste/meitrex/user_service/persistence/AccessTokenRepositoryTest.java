@@ -18,13 +18,14 @@ import static org.hamcrest.Matchers.*;
 
 @SpringBootTest({"spring.main.allow-bean-definition-overriding=true"})
 @ContextConfiguration(classes = MockKeycloakConfiguration.class)
-public class AccessTokenRepositoryTest {
+class AccessTokenRepositoryTest {
 
     @Autowired
     private AccessTokenRepository accessTokenRepository;
 
     @Test
-    public void testFindTokenByUserIdAndProvider() {
+
+    void testFindTokenByUserIdAndProvider() {
         UUID userId = UUID.randomUUID();
         AccessTokenEntity accessToken = AccessTokenEntity.builder()
                 .userId(userId)
