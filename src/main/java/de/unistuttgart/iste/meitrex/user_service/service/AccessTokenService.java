@@ -163,7 +163,7 @@ public class AccessTokenService {
 
     /**
      * Generates a new access token for the given user and external service provider.
-     * This method exchanges an authorization code for an access token and stores it in the database.
+     * This method exchanges an authorization code for an access token.
      *
      * @param currentUser the currently logged-in user.
      * @param input       the input containing the authorization code and provider.
@@ -172,12 +172,13 @@ public class AccessTokenService {
     public boolean generateAccessToken(LoggedInUser currentUser, GenerateAccessTokenInput input) {
         final ExternalServiceProvider provider = modelMapper.map(input.getProvider(), ExternalServiceProvider.class);
         final UserInfo currentUserInfo = userService.findUserInfoInHeader(currentUser);
+        final ExternalServiceProviderInfo providerInfo = providersConfig.getProviders().get(provider);
 
         try {
-            AccessTokenResponse tokenResponse = exchangeCodeForAccessToken(provider, input.getAuthorizationCode());
+            AccessTokenResponse tokenResponse = exchangeCodeForAccessToken(input.getAuthorizationCode(), providerInfo);
 
             if (tokenResponse != null && tokenResponse.getAccessToken() != null) {
-                String externalUserId = this.tryGetExternalUserId(tokenResponse.getAccessToken(), provider);
+                String externalUserId = this.tryGetExternalUserId(tokenResponse.getAccessToken(), providerInfo);
 
                 AccessTokenEntity accessTokenEntity = AccessTokenEntity.builder()
                         .userId(currentUserInfo.getId())
@@ -199,9 +200,7 @@ public class AccessTokenService {
         return false;
     }
 
-    private AccessTokenResponse exchangeCodeForAccessToken(ExternalServiceProvider provider, String code) throws IOException, InterruptedException {
-        ExternalServiceProviderInfo providerInfo = providersConfig.getProviders().get(provider);
-
+    private AccessTokenResponse exchangeCodeForAccessToken(String code, ExternalServiceProviderInfo providerInfo) throws IOException, InterruptedException {
         String requestBody = "client_id=" + providerInfo.getClientId() +
                 "&client_secret=" + providerInfo.getClientSecret() +
                 "&code=" + code;
@@ -223,13 +222,9 @@ public class AccessTokenService {
         return null;
     }
 
-    private String tryGetExternalUserId(String accessToken, ExternalServiceProvider provider) {
-        if (provider != ExternalServiceProvider.GITHUB) {
-            return null;
-        }
-
+    private String tryGetExternalUserId(String accessToken, ExternalServiceProviderInfo providerInfo) {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.github.com/user"))
+                .uri(URI.create(providerInfo.getExternalUserIdUrl()))
                 .header("Accept", "application/vnd.github+json")
                 .header("Authorization", "Bearer " + accessToken)
                 .header("X-GitHub-Api-Version", "2022-11-28")
@@ -241,10 +236,10 @@ public class AccessTokenService {
 
             if (response.statusCode() == 200) {
                 JsonObject user = JsonParser.parseString(response.body()).getAsJsonObject();
-                String username = user.get("login").getAsString();
-                return username;
+                return user.get("login").getAsString();
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (Exception e) {
+            // throw to avoid saving a token without external user ID
             throw new RuntimeException(e);
         }
 

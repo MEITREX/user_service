@@ -19,5 +19,8 @@ public class ExternalServiceProviderInfo {
 
     @NonNull
     private final String tokenRequestUrl;
+
+    @NonNull
+    private final String externalUserIdUrl;
 }
 
