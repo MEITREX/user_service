@@ -1,10 +1,7 @@
 package de.unistuttgart.iste.meitrex.user_service.service;
 
 import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
-import de.unistuttgart.iste.meitrex.generated.dto.AccessToken;
-import de.unistuttgart.iste.meitrex.generated.dto.ExternalServiceProviderDto;
-import de.unistuttgart.iste.meitrex.generated.dto.GenerateAccessTokenInput;
-import de.unistuttgart.iste.meitrex.generated.dto.UserInfo;
+import de.unistuttgart.iste.meitrex.generated.dto.*;
 import de.unistuttgart.iste.meitrex.user_service.config.access_token.ExternalServiceProviderInfo;
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.AccessTokenEntity;
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.ExternalServiceProvider;
@@ -20,6 +17,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -227,6 +225,7 @@ class AccessTokenServiceTest {
         when(providerInfo.getClientId()).thenReturn("clientId");
         when(providerInfo.getClientSecret()).thenReturn("clientSecret");
         when(providerInfo.getTokenRequestUrl()).thenReturn("https://mock.token.url");
+        when(providerInfo.getExternalUserIdUrl()).thenReturn("https://api.github.com/user");
 
         Map<ExternalServiceProvider, ExternalServiceProviderInfo> providersMap =
                 Map.of(ExternalServiceProvider.GITHUB, providerInfo);
@@ -278,4 +277,72 @@ class AccessTokenServiceTest {
         assertThat(savedEntity.getAccessToken(), is("generated_access_token"));
         assertThat(savedEntity.getRefreshToken(), is("refresh_token"));
     }
+
+    @Test
+    void testGetExternalUserIds_someUsersHaveTokens() {
+        // Given
+        UUID userId1 = UUID.randomUUID();
+        UUID userId2 = UUID.randomUUID();
+        UUID userId3 = UUID.randomUUID(); // this user will not have a token
+
+        AccessTokenEntity token1 = new AccessTokenEntity();
+        token1.setUserId(userId1);
+        token1.setExternalUserId("user1_ext");
+
+        AccessTokenEntity token2 = new AccessTokenEntity();
+        token2.setUserId(userId2);
+        token2.setExternalUserId("user2_ext");
+
+        when(modelMapper.map(ExternalServiceProviderDto.GITHUB, ExternalServiceProvider.class))
+                .thenReturn(ExternalServiceProvider.GITHUB);
+
+        when(accessTokenRepository.findByUserIdAndProvider(userId1, ExternalServiceProvider.GITHUB))
+                .thenReturn(Optional.of(token1));
+        when(accessTokenRepository.findByUserIdAndProvider(userId2, ExternalServiceProvider.GITHUB))
+                .thenReturn(Optional.of(token2));
+        when(accessTokenRepository.findByUserIdAndProvider(userId3, ExternalServiceProvider.GITHUB))
+                .thenReturn(Optional.empty());
+
+        List<ExternalUserIdWithUser> result = accessTokenService.getExternalUserIds(
+                ExternalServiceProviderDto.GITHUB,
+                List.of(userId1, userId2, userId3)
+        );
+
+        assertThat(result, hasSize(2));
+        assertThat(result, containsInAnyOrder(
+                new ExternalUserIdWithUser(userId1, "user1_ext"),
+                new ExternalUserIdWithUser(userId2, "user2_ext")
+        ));
+    }
+
+    @Test
+    void testGetExternalUserIds_noUsersHaveTokens() {
+        UUID userId1 = UUID.randomUUID();
+        UUID userId2 = UUID.randomUUID();
+
+        when(modelMapper.map(ExternalServiceProviderDto.GITHUB, ExternalServiceProvider.class))
+                .thenReturn(ExternalServiceProvider.GITHUB);
+
+        when(accessTokenRepository.findByUserIdAndProvider(any(), eq(ExternalServiceProvider.GITHUB)))
+                .thenReturn(Optional.empty());
+
+        List<ExternalUserIdWithUser> result = accessTokenService.getExternalUserIds(
+                ExternalServiceProviderDto.GITHUB,
+                List.of(userId1, userId2)
+        );
+
+        assertThat(result, is(empty()));
+    }
+
+    @Test
+    void testGetExternalUserIds_emptyInputList() {
+        List<ExternalUserIdWithUser> result = accessTokenService.getExternalUserIds(
+                ExternalServiceProviderDto.GITHUB,
+                List.of()
+        );
+
+        assertThat(result, is(empty()));
+        verifyNoInteractions(accessTokenRepository);
+    }
+
 }
