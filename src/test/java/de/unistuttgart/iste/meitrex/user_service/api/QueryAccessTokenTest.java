@@ -121,7 +121,7 @@ class QueryAccessTokenTest {
         );
 
         when(accessTokenService.getExternalUserIds(ExternalServiceProviderDto.GITHUB, List.of(userId1, userId2)))
-                .thenReturn(List.of());
+                .thenReturn(expectedResult);
 
         String query = """
         query($provider: ExternalServiceProviderDto!, $userIds: [UUID!]!) {
