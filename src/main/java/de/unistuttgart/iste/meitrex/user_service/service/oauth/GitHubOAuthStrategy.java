@@ -16,6 +16,40 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+/**
+ * OAuth2 strategy implementation for GitHub.
+ * <p>
+ * This class encapsulates all provider-specific logic required to interact with GitHub’s OAuth2 API,
+ * including:
+ * <ul>
+ *     <li>Exchanging authorization codes for access tokens</li>
+ *     <li>Refreshing expired access tokens (if enabled)</li>
+ *     <li>Fetching the authenticated user's GitHub username</li>
+ * </ul>
+ * <p>
+ * Configuration details (such as client credentials and endpoint URLs) are retrieved from
+ * {@link ExternalServiceProviderConfiguration}, and must be defined under the
+ * {@code thirdparty.providers.github} prefix in {@code application.properties}.
+ * </p>
+ *
+ * <h3>Example usage:</h3>
+ * This strategy is selected by {@link ExternalOAuthClient} based on the
+ * {@link ExternalServiceProvider#GITHUB} enum value.
+ *
+ * <h3>Example configuration:</h3>
+ * <pre>
+ * thirdparty.providers.github.clientId=...
+ * thirdparty.providers.github.clientSecret=...
+ * thirdparty.providers.github.tokenRequestUrl=https://github.com/login/oauth/access_token
+ * thirdparty.providers.github.externalUserIdUrl=https://api.github.com/user
+ * </pre>
+ *
+ * @see ExternalOAuthStrategy
+ * @see ExternalOAuthClient
+ * @see ExternalServiceProviderConfiguration
+ * @see ExternalServiceProviderInfo
+ */
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
