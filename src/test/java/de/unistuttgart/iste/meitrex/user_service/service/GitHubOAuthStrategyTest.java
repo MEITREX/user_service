@@ -1,6 +1,5 @@
 package de.unistuttgart.iste.meitrex.user_service.service;
 
-import com.google.gson.JsonObject;
 import de.unistuttgart.iste.meitrex.user_service.config.access_token.AccessTokenResponse;
 import de.unistuttgart.iste.meitrex.user_service.config.access_token.ExternalServiceProviderConfiguration;
 import de.unistuttgart.iste.meitrex.user_service.config.access_token.ExternalServiceProviderInfo;
@@ -22,13 +21,12 @@ class GitHubOAuthStrategyTest {
 
     private GitHubOAuthStrategy strategy;
     private HttpClient mockClient;
-    private ExternalServiceProviderConfiguration mockConfig;
     private HttpResponse<String> mockResponse;
 
     @BeforeEach
     void setUp() {
         mockClient = mock(HttpClient.class);
-        mockConfig = mock(ExternalServiceProviderConfiguration.class);
+        ExternalServiceProviderConfiguration mockConfig = mock(ExternalServiceProviderConfiguration.class);
         mockResponse = mock(HttpResponse.class);
 
         ExternalServiceProviderInfo githubInfo = ExternalServiceProviderInfo.builder()

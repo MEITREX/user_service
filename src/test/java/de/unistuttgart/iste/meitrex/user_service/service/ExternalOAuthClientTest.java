@@ -6,7 +6,6 @@ import de.unistuttgart.iste.meitrex.user_service.service.oauth.ExternalOAuthClie
 import de.unistuttgart.iste.meitrex.user_service.service.oauth.ExternalOAuthStrategy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.util.List;

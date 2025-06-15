@@ -120,10 +120,8 @@ class QueryAccessTokenTest {
                 new ExternalUserIdWithUser(userId2, "user2")
         );
 
-        when(accessTokenService.getExternalUserIds(
-                eq(ExternalServiceProviderDto.GITHUB),
-                eq(List.of(userId1, userId2)))
-        ).thenReturn(expectedResult);
+        when(accessTokenService.getExternalUserIds(ExternalServiceProviderDto.GITHUB, List.of(userId1, userId2)))
+                .thenReturn(List.of());
 
         String query = """
         query($provider: ExternalServiceProviderDto!, $userIds: [UUID!]!) {
@@ -150,10 +148,8 @@ class QueryAccessTokenTest {
     void testInternalGetExternalUserIds_emptyList(WebGraphQlTester tester) {
         List<UUID> userIds = List.of(UUID.randomUUID(), UUID.randomUUID());
 
-        when(accessTokenService.getExternalUserIds(
-                eq(ExternalServiceProviderDto.GITHUB),
-                eq(userIds))
-        ).thenReturn(List.of());
+        when(accessTokenService.getExternalUserIds(ExternalServiceProviderDto.GITHUB, userIds))
+                .thenReturn(List.of());
 
         String query = """
         query($provider: ExternalServiceProviderDto!, $userIds: [UUID!]!) {
