@@ -113,4 +113,39 @@ class GitHubOAuthStrategyTest {
         assertEquals(86400, result.getRefreshTokenExpiresIn());
     }
 
+    @Test
+    void exchangeCodeForAccessToken_shouldReturnNullOnFailure() throws IOException, InterruptedException {
+        when(mockResponse.statusCode()).thenReturn(401);
+        when(mockResponse.body()).thenReturn("Unauthorized");
+        when(mockClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
+                .thenReturn(mockResponse);
+
+        AccessTokenResponse result = strategy.exchangeCodeForAccessToken("invalid_code");
+
+        assertNull(result);
+    }
+
+    @Test
+    void refreshAccessToken_shouldReturnNullOnFailure() throws IOException, InterruptedException {
+        when(mockResponse.statusCode()).thenReturn(400);
+        when(mockResponse.body()).thenReturn("Bad Request");
+        when(mockClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
+                .thenReturn(mockResponse);
+
+        AccessTokenResponse result = strategy.refreshAccessToken("invalid_refresh_token");
+
+        assertNull(result);
+    }
+
+    @Test
+    void fetchExternalUserId_shouldReturnNullOnFailure() throws IOException, InterruptedException {
+        when(mockResponse.statusCode()).thenReturn(403);
+        when(mockResponse.body()).thenReturn("Forbidden");
+        when(mockClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
+                .thenReturn(mockResponse);
+
+        String userId = strategy.fetchExternalUserId("invalid_token");
+
+        assertNull(userId);
+    }
 }
