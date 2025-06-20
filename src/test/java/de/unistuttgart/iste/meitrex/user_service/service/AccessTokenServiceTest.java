@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.modelmapper.ModelMapper;
 
+import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -317,4 +318,58 @@ class AccessTokenServiceTest {
         verifyNoInteractions(accessTokenRepository);
     }
 
+    @Test
+    void testGenerateAccessToken_throwsIOException() throws Exception {
+        GenerateAccessTokenInput input = new GenerateAccessTokenInput();
+        input.setAuthorizationCode("mockCode");
+        input.setProvider(ExternalServiceProviderDto.GITHUB);
+
+        when(modelMapper.map(input.getProvider(), ExternalServiceProvider.class))
+                .thenReturn(ExternalServiceProvider.GITHUB);
+
+        when(externalOAuthClient.exchangeCodeForAccessToken(any(), any()))
+                .thenThrow(new IOException("Simulated failure"));
+
+        boolean result = accessTokenService.generateAccessToken(loggedInUser, input);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testGenerateAccessToken_throwsInterruptedException() throws Exception {
+        GenerateAccessTokenInput input = new GenerateAccessTokenInput();
+        input.setAuthorizationCode("mockCode");
+        input.setProvider(ExternalServiceProviderDto.GITHUB);
+
+        when(modelMapper.map(input.getProvider(), ExternalServiceProvider.class))
+                .thenReturn(ExternalServiceProvider.GITHUB);
+
+        when(externalOAuthClient.exchangeCodeForAccessToken(any(), any()))
+                .thenThrow(new InterruptedException("Simulated interrupt"));
+
+        boolean result = accessTokenService.generateAccessToken(loggedInUser, input);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testGetAccessToken_refreshToken_throwsIOException() throws Exception {
+        validAccessToken.setAccessToken("expired_access_token");
+        validAccessToken.setAccessTokenExpiresAt(OffsetDateTime.now().minusMinutes(5));
+        validAccessToken.setRefreshToken("refresh_token");
+        validAccessToken.setRefreshTokenExpiresAt(OffsetDateTime.now().plusMinutes(5));
+
+        when(modelMapper.map(providerDto, ExternalServiceProvider.class))
+                .thenReturn(ExternalServiceProvider.GITHUB);
+
+        when(accessTokenRepository.findByUserIdAndProvider(any(), any()))
+                .thenReturn(Optional.of(validAccessToken));
+
+        when(externalOAuthClient.refreshAccessToken(any(), any()))
+                .thenThrow(new IOException("Simulated error"));
+
+        AccessToken token = accessTokenService.getAccessToken(loggedInUser.getId(), providerDto);
+
+        assertNull(token);
+    }
 }
