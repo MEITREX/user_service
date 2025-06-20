@@ -5,6 +5,10 @@ type Mutation {
     After the access token is generated, the user is redirected to the redirect URI.
     """
     generateAccessToken(input: GenerateAccessTokenInput!): Boolean!
+
+    updateSettings(userId: UUID!, input: SettingsInput!): Settings!
+
+    defaultSettings(userId: UUID!): Settings!
 }
 
 input GenerateAccessTokenInput {
