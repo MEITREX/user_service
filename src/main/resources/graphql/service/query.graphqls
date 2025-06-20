@@ -39,4 +39,9 @@ type Query {
     ⚠️ This query is **only accessible internally** and the caller must be at least a tutor of a course. The permission must be validated by the caller method. ⚠️
     """
     _internal_getExternalUserIds(userIds: [UUID!]!, provider: ExternalServiceProviderDto): [ExternalUserIdWithUser!]!
+    
+    findUserSettings(userId: UUID): Settings!
+
+    findUsersSettings(usersIds: [UUID]!): [Settings]!
+    
 }
