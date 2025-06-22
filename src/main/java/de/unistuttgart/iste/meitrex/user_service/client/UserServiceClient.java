@@ -87,19 +87,19 @@ public class UserServiceClient {
 
     public AccessToken queryAccessToken(LoggedInUser currentUser, ExternalServiceProviderDto provider) throws UserServiceConnectionException {
         final String query = """
-            query($currentUserId: UUID!, $provider: ExternalServiceProviderDto!) {
-                _internal_getAccessToken(currentUserId: $currentUserId, provider: $provider) {
+            query($userId: UUID!, $provider: ExternalServiceProviderDto!) {
+                _internal_noauth_getAccessToken(userId: $userId, provider: $provider) {
                     accessToken
                     externalUserId
                 }
             }
         """;
-        final String queryName = "_internal_getAccessToken";
+        final String queryName = "_internal_noauth_getAccessToken";
 
         try {
             return graphQlClient.document(query)
                     .variable("provider", provider)
-                    .variable("currentUserId", currentUser.getId())
+                    .variable("userId", currentUser.getId())
                     .execute()
                     .handle((ClientGraphQlResponse result, SynchronousSink<AccessToken> sink) -> {
                         if (!result.isValid()) {
@@ -138,13 +138,13 @@ public class UserServiceClient {
     public List<ExternalUserIdWithUser> queryExternalUserIds(ExternalServiceProviderDto provider, List<UUID> userIds) throws UserServiceConnectionException {
         final String query = """
         query($provider: ExternalServiceProviderDto!, $userIds: [UUID!]!) {
-            _internal_getExternalUserIds(provider: $provider, userIds: $userIds) {
+            _internal_noauth_getExternalUserIds(provider: $provider, userIds: $userIds) {
                 userId
                 externalUserId
             }
         }
     """;
-        final String queryName = "_internal_getExternalUserIds";
+        final String queryName = "_internal_noauth_getExternalUserIds";
 
         try {
             return graphQlClient.document(query)

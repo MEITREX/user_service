@@ -71,18 +71,18 @@ class QueryAccessTokenTest {
                 .thenReturn(new AccessToken(token, null));
 
         String query = """
-            query($currentUserId: UUID!, $provider: ExternalServiceProviderDto!) {
-                _internal_getAccessToken(currentUserId: $currentUserId, provider: $provider) {
+            query($userId: UUID!, $provider: ExternalServiceProviderDto!) {
+                _internal_noauth_getAccessToken(userId: $userId, provider: $provider) {
                     accessToken
                 }
             }
         """;
 
         tester.document(query)
-                .variable("currentUserId", user.getId())
+                .variable("userId", user.getId())
                 .variable("provider", ExternalServiceProviderDto.GITHUB)
                 .execute()
-                .path("_internal_getAccessToken.accessToken")
+                .path("_internal_noauth_getAccessToken.accessToken")
                 .entity(String.class)
                 .isEqualTo(token);
     }
@@ -125,7 +125,7 @@ class QueryAccessTokenTest {
 
         String query = """
         query($provider: ExternalServiceProviderDto!, $userIds: [UUID!]!) {
-            _internal_getExternalUserIds(provider: $provider, userIds: $userIds) {
+            _internal_noauth_getExternalUserIds(provider: $provider, userIds: $userIds) {
                 userId
                 externalUserId
             }
@@ -136,7 +136,7 @@ class QueryAccessTokenTest {
                 .variable("provider", ExternalServiceProviderDto.GITHUB)
                 .variable("userIds", List.of(userId1, userId2))
                 .execute()
-                .path("_internal_getExternalUserIds")
+                .path("_internal_noauth_getExternalUserIds")
                 .entityList(ExternalUserIdWithUser.class)
                 .get();
 
@@ -153,7 +153,7 @@ class QueryAccessTokenTest {
 
         String query = """
         query($provider: ExternalServiceProviderDto!, $userIds: [UUID!]!) {
-            _internal_getExternalUserIds(provider: $provider, userIds: $userIds) {
+            _internal_noauth_getExternalUserIds(provider: $provider, userIds: $userIds) {
                 userId
                 externalUserId
             }
@@ -164,7 +164,7 @@ class QueryAccessTokenTest {
                 .variable("provider", ExternalServiceProviderDto.GITHUB)
                 .variable("userIds", userIds)
                 .execute()
-                .path("_internal_getExternalUserIds")
+                .path("_internal_noauth_getExternalUserIds")
                 .entityList(ExternalUserIdWithUser.class)
                 .hasSize(0);
     }
