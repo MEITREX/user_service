@@ -14,3 +14,13 @@ type UserInfo {
     lastName: String!
     realmRoles: [GlobalUserRole!]!
 }
+
+type AccessToken {
+    accessToken: String!
+    externalUserId: String
+}
+
+type ExternalUserIdWithUser {
+    userId: UUID!
+    externalUserId: String!
+}

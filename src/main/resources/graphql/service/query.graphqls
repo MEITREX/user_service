@@ -14,7 +14,32 @@ type Query {
     If a user does not exist, null is returned for that user.
     """
     findUserInfos(ids: [UUID!]!): [UserInfo]!
+    """
+    Checks whether an access token for a given third-party provider exists and is still valid for the currently authenticated user.
+    Returns `true` if:
+    - The access token exists and is not expired, OR
+    - The refresh token exists and is not expired.
+    """
+    isAccessTokenAvailable(provider: ExternalServiceProviderDto!): Boolean!
 
+    """
+    Retrieves the access token of the specified user for a specified third-party provider.
+
+    - If the access token is expired but a valid refresh token is available, the system will attempt to generate a new access token.
+    - Throws an exception if neither a valid access token nor a valid refresh token is available.
+
+    ⚠️ This query is **only accessible internally**. ⚠️
+    """
+    _internal_noauth_getAccessToken(userId: UUID!, provider: ExternalServiceProviderDto!): AccessToken!
+
+    """
+    Retrieves the external user IDs for a list of users with the specified IDs.
+    If a user does not exist, null is returned for that user.
+    If the user does not have an external user ID for the specified provider, null is returned for that user.
+    ⚠️ This query is **only accessible internally** and the caller must be at least a tutor of a course. The permission must be validated by the caller method. ⚠️
+    """
+    _internal_noauth_getExternalUserIds(userIds: [UUID!]!, provider: ExternalServiceProviderDto): [ExternalUserIdWithUser!]!
+    
     findUserSettings(userId: UUID): Settings!
 
     findUsersSettings(usersIds: [UUID]!): [Settings]!

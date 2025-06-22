@@ -10,7 +10,7 @@ services:
       - "5432:5432"
     volumes:
       - dbdata:/var/lib/postgresql/data
-      - ./../gamification_service/pg-init-scripts:/docker-entrypoint-initdb.d
+      - ./../user_service/pg-init-scripts:/docker-entrypoint-initdb.d
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
@@ -29,10 +29,13 @@ services:
       - "5001:5001"
     depends_on:
       - database
+    links:
+      - database
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/user_service
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+      KEYCLOAK_URL: http://keycloak:8080/
   dapr-user:
     image: "daprio/daprd"
     command: [
