@@ -7,6 +7,7 @@ import de.unistuttgart.iste.meitrex.generated.dto.GenerateAccessTokenInput;
 import de.unistuttgart.iste.meitrex.user_service.service.AccessTokenService;
 import lombok.RequiredArgsConstructor;
 import de.unistuttgart.iste.meitrex.generated.dto.AccessToken;
+import lombok.extern.java.Log;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.ContextValue;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Controller;
 
 import java.util.List;
 import java.util.UUID;
+
+import static de.unistuttgart.iste.meitrex.common.user_handling.UserCourseAccessValidator.validateUserHasAccessToCourse;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,12 +30,12 @@ public class AccessTokenController {
         return accessTokenService.isAccessTokenAvailable(currentUser, provider);
     }
 
-    @QueryMapping(name="_internal_getAccessToken")
-    public AccessToken getAccessToken(@Argument UUID currentUserId, @Argument ExternalServiceProviderDto provider) {
-        return accessTokenService.getAccessToken(currentUserId, provider);
+    @QueryMapping(name="_internal_noauth_getAccessToken")
+    public AccessToken getAccessToken(@Argument UUID userId, @Argument ExternalServiceProviderDto provider) {
+        return accessTokenService.getAccessToken(userId, provider);
     }
 
-    @QueryMapping(name="_internal_getExternalUserIds")
+    @QueryMapping(name="_internal_noauth_getExternalUserIds")
     public List<ExternalUserIdWithUser> getExternalUserIds(@Argument ExternalServiceProviderDto provider, @Argument List<UUID> userIds) {
         return accessTokenService.getExternalUserIds(provider, userIds);
     }
