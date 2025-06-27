@@ -6,17 +6,24 @@
   * [Query](#query)
   * [Mutation](#mutation)
   * [Objects](#objects)
+    * [AccessToken](#accesstoken)
+    * [ExternalUserIdWithUser](#externaluseridwithuser)
+    * [Notification](#notification)
     * [PaginationInfo](#paginationinfo)
     * [PublicUserInfo](#publicuserinfo)
+    * [Settings](#settings)
     * [UserInfo](#userinfo)
   * [Inputs](#inputs)
     * [DateTimeFilter](#datetimefilter)
     * [GenerateAccessTokenInput](#generateaccesstokeninput)
     * [IntFilter](#intfilter)
+    * [NotificationInput](#notificationinput)
     * [Pagination](#pagination)
+    * [SettingsInput](#settingsinput)
     * [StringFilter](#stringfilter)
   * [Enums](#enums)
     * [ExternalServiceProviderDto](#externalserviceproviderdto)
+    * [Gamification](#gamification)
     * [GlobalUserRole](#globaluserrole)
     * [SortDirection](#sortdirection)
   * [Scalars](#scalars)
@@ -101,22 +108,69 @@ Returns `true` if:
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong id="query._internal_getaccesstoken">_internal_getAccessToken</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td colspan="2" valign="top"><strong id="query._internal_noauth_getaccesstoken">_internal_noauth_getAccessToken</strong></td>
+<td valign="top"><a href="#accesstoken">AccessToken</a>!</td>
 <td>
 
-Retrieves the access token of the currently authenticated user for a specified third-party provider.
+Retrieves the access token of the specified user for a specified third-party provider.
 
 - If the access token is expired but a valid refresh token is available, the system will attempt to generate a new access token.
 - Throws an exception if neither a valid access token nor a valid refresh token is available.
 
-⚠️ This query is **only accessible internally** and allows the caller to retrieve their own access token. ⚠️
+⚠️ This query is **only accessible internally**. ⚠️
 
 </td>
 </tr>
 <tr>
+<td colspan="2" align="right" valign="top">userId</td>
+<td valign="top"><a href="#uuid">UUID</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" align="right" valign="top">provider</td>
 <td valign="top"><a href="#externalserviceproviderdto">ExternalServiceProviderDto</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="query._internal_noauth_getexternaluserids">_internal_noauth_getExternalUserIds</strong></td>
+<td valign="top">[<a href="#externaluseridwithuser">ExternalUserIdWithUser</a>!]!</td>
+<td>
+
+Retrieves the external user IDs for a list of users with the specified IDs.
+If a user does not exist, null is returned for that user.
+If the user does not have an external user ID for the specified provider, null is returned for that user.
+⚠️ This query is **only accessible internally** and the caller must be at least a tutor of a course. The permission must be validated by the caller method. ⚠️
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">userIds</td>
+<td valign="top">[<a href="#uuid">UUID</a>!]!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">provider</td>
+<td valign="top"><a href="#externalserviceproviderdto">ExternalServiceProviderDto</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="query.findusersettings">findUserSettings</strong></td>
+<td valign="top"><a href="#settings">Settings</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">userId</td>
+<td valign="top"><a href="#uuid">UUID</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="query.finduserssettings">findUsersSettings</strong></td>
+<td valign="top">[<a href="#settings">Settings</a>]!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">usersIds</td>
+<td valign="top">[<a href="#uuid">UUID</a>]!</td>
 <td></td>
 </tr>
 </tbody>
@@ -149,10 +203,110 @@ After the access token is generated, the user is redirected to the redirect URI.
 <td valign="top"><a href="#generateaccesstokeninput">GenerateAccessTokenInput</a>!</td>
 <td></td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong id="mutation.updatesettings">updateSettings</strong></td>
+<td valign="top"><a href="#settings">Settings</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">userId</td>
+<td valign="top"><a href="#uuid">UUID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#settingsinput">SettingsInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="mutation.defaultsettings">defaultSettings</strong></td>
+<td valign="top"><a href="#settings">Settings</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">userId</td>
+<td valign="top"><a href="#uuid">UUID</a>!</td>
+<td></td>
+</tr>
 </tbody>
 </table>
 
 ## Objects
+
+### AccessToken
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong id="accesstoken.accesstoken">accessToken</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="accesstoken.externaluserid">externalUserId</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### ExternalUserIdWithUser
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong id="externaluseridwithuser.userid">userId</strong></td>
+<td valign="top"><a href="#uuid">UUID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="externaluseridwithuser.externaluserid">externalUserId</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### Notification
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong id="notification.gamification">gamification</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="notification.lecture">lecture</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 
 ### PaginationInfo
 
@@ -236,6 +390,31 @@ Whether there is a next page.
 <tr>
 <td colspan="2" valign="top"><strong id="publicuserinfo.username">userName</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### Settings
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong id="settings.gamification">gamification</strong></td>
+<td valign="top"><a href="#gamification">Gamification</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="settings.notification">notification</strong></td>
+<td valign="top"><a href="#notification">Notification</a></td>
 <td></td>
 </tr>
 </tbody>
@@ -339,11 +518,6 @@ If specified, filters for dates before the specified value.
 <td valign="top"><a href="#string">String</a>!</td>
 <td></td>
 </tr>
-<tr>
-<td colspan="2" valign="top"><strong id="generateaccesstokeninput.redirecturi">redirectUri</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
 </tbody>
 </table>
 
@@ -391,6 +565,30 @@ If specified, filters for values less than to the specified value.
 </tbody>
 </table>
 
+### NotificationInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong id="notificationinput.gamification">gamification</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="notificationinput.lecture">lecture</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### Pagination
 
 Specifies the page size and page number for paginated results.
@@ -424,6 +622,30 @@ If this value is larger than the number of pages, an empty page is returned.
 The number of elements per page.
 
 </td>
+</tr>
+</tbody>
+</table>
+
+### SettingsInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong id="settingsinput.gamification">gamification</strong></td>
+<td valign="top"><a href="#gamification">Gamification</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="settingsinput.notification">notification</strong></td>
+<td valign="top"><a href="#notificationinput">NotificationInput</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -486,6 +708,31 @@ If true, the filter is case-insensitive.
 <tbody>
 <tr>
 <td valign="top"><strong>GITHUB</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### Gamification
+
+<table>
+<thead>
+<tr>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>GAMIFICATION_ENABLED</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>ADAPTIVE_GAMIFICATION_ENABLED</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>ALL_GAMIFICATION_DISABLED</strong></td>
 <td></td>
 </tr>
 </tbody>
