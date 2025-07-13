@@ -12,18 +12,18 @@ The User Service has one role in our system:
 
 ## Environment variables 
 ### Relevant for deployment
-| Name                                  | Description                                                | Value in Dev Environment                    | Value in Prod Environment |
-|---------------------------------------|------------------------------------------------------------|---------------------------------------------|---------------------------|
-| DAPR_HTTP_PORT                        | Dapr HTTP Port                                             | 5000                                        | 3500                      |
-| server.port                           | Port on which the application runs                         | 5001                                        | 5001                      |
-| KEYCLOAK_URL                          | Keycloak URL                                               | http://localhost:9009/                      | http://keycloak/keycloak  |
-| KEYCLOAK_PASSWORD                     | Keycloak admin password                                    | admin                                       | *secret*                  |
-| keycloak.clientId                     | Keycloak client ID                                         | admin-cli                                   | admin-cli                 |
-| keycloak.masterRealm                  | Keycloak master realm                                      | master                                      | master                    |
-| keycloak.realm                        | Keycloak realm for the application                         | GITS                                        | GITS                      |
-| keycloak.username                     | Keycloak admin username                                    | admin                                       | admin                     |
-| thirdparty.providers.github.clientId | GitHub app client ID used to manage user access tokens     | Iv23liynxdcJafLw0ptQ                        |                      |
-| thirdparty.providers.github.clientSecret                     | GitHub app client secret used to manage user access tokens | PUT_YOUR_CLIENT_SECRET_FOR_DEVELOPMENT_HERE | **secret**                |
+| Name                                     | Description                                                | Value in Dev Environment                    | Value in Prod Environment |
+|------------------------------------------|------------------------------------------------------------|---------------------------------------------|---------------------------|
+| DAPR_HTTP_PORT                           | Dapr HTTP Port                                             | 5000                                        | 3500                      |
+| server.port                              | Port on which the application runs                         | 5001                                        | 5001                      |
+| KEYCLOAK_URL                             | Keycloak URL                                               | http://localhost:9009/                      | http://keycloak/keycloak  |
+| KEYCLOAK_PASSWORD                        | Keycloak admin password                                    | admin                                       | *secret*                  |
+| keycloak.clientId                        | Keycloak client ID                                         | admin-cli                                   | admin-cli                 |
+| keycloak.masterRealm                     | Keycloak master realm                                      | master                                      | master                    |
+| keycloak.realm                           | Keycloak realm for the application                         | GITS                                        | GITS                      |
+| keycloak.username                        | Keycloak admin username                                    | admin                                       | admin                     |
+| thirdparty.providers.github.clientId     | GitHub app client ID used to manage user access tokens     | Iv23liynxdcJafLw0ptQ                        |                           |
+| thirdparty.providers.github.clientSecret | GitHub app client secret used to manage user access tokens | PUT_YOUR_CLIENT_SECRET_FOR_DEVELOPMENT_HERE | **secret**                |
 
 thirdparty.providers.github.tokenRequestUrl
 thirdparty.providers.github.externalUserIdUrl
