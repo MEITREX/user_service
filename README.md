@@ -4,7 +4,7 @@ The User Service has two roles in our system:
 
 **GraphQL Interface for User Metadata:** The service has a GraphQL interface that makes it simple to get user information stored in Keycloak. 
 
-**OAuth2 Access Token Management:** Handles generation, storage, refresh, and retrieval of OAuth2 access tokens for external service providers (e.g., GitHub).
+**OAuth2 Access Token Management:** Handles generation, storage, refresh, and retrieval of OAuth2 access tokens for external service providers (e.g., GitHub). This enables other services to securely interact with external APIs on behalf of users.
 
 
 ## Purpose
