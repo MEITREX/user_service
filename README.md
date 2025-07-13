@@ -1,8 +1,11 @@
 # User Service
 
-The User Service has one role in our system: 
+The User Service has two roles in our system: 
 
 **GraphQL Interface for User Metadata:** The service has a GraphQL interface that makes it simple to get user information stored in Keycloak. 
+
+**OAuth2 Access Token Management:** Handles generation, storage, refresh, and retrieval of OAuth2 access tokens for external service providers (e.g., GitHub).
+
 
 ## Purpose
 
