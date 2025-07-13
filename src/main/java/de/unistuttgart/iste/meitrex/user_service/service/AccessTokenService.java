@@ -1,11 +1,7 @@
 package de.unistuttgart.iste.meitrex.user_service.service;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.meitrex.generated.dto.*;
-import de.unistuttgart.iste.meitrex.user_service.config.access_token.ExternalServiceProviderInfo;
-import de.unistuttgart.iste.meitrex.user_service.config.access_token.ExternalServiceProviderConfiguration;
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.AccessTokenEntity;
 import de.unistuttgart.iste.meitrex.user_service.persistence.entity.ExternalServiceProvider;
 import de.unistuttgart.iste.meitrex.user_service.persistence.repository.AccessTokenRepository;
