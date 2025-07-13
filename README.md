@@ -28,8 +28,6 @@ The User Service has two roles in our system:
 | thirdparty.providers.github.clientId     | GitHub app client ID used to manage user access tokens     | Iv23liynxdcJafLw0ptQ     | Iv23liNIRTUsh31DAv4u      |
 | thirdparty.providers.github.clientSecret | GitHub app client secret used to manage user access tokens | *dev secret*             | *secret*                  |
 
-thirdparty.providers.github.tokenRequestUrl
-thirdparty.providers.github.externalUserIdUrl
 ### Other properties
 | Name                                          | Description                                                                | Value in Dev Environment                    | Value in Prod Environment               |
 |-----------------------------------------------|----------------------------------------------------------------------------|---------------------------------------------|-----------------------------------------|
