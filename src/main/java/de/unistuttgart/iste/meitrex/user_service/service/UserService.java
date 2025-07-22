@@ -4,9 +4,12 @@ import de.unistuttgart.iste.meitrex.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.meitrex.generated.dto.PublicUserInfo;
 import de.unistuttgart.iste.meitrex.generated.dto.UserInfo;
 import de.unistuttgart.iste.meitrex.user_service.config.user.KeycloakWrapper;
+import de.unistuttgart.iste.meitrex.user_service.persistence.entity.UserEntity;
 import de.unistuttgart.iste.meitrex.user_service.persistence.mapper.RealmMapper;
+import de.unistuttgart.iste.meitrex.user_service.persistence.repository.UserRepository;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -22,6 +25,7 @@ public class UserService {
     private final KeycloakWrapper keycloak;
 
     private final RealmMapper realmMapper;
+    private final UserRepository userRepository;
 
     /**
      * Find public user infos by ids.
@@ -85,6 +89,7 @@ public class UserService {
                 currentUser.getUserName(),
                 currentUser.getFirstName(),
                 currentUser.getLastName(),
+                currentUser.getNickname(),
                 realmMapper.internalRolesToGraphQlRoles(currentUser.getRealmRoles())
         );
     }
@@ -96,14 +101,26 @@ public class UserService {
      * @return an optional of the user info or empty if the user could not be retrieved.
      */
     public Optional<UserInfo> findUserInfo(UUID id) {
+        UserEntity userEntity = userRepository.findById(id).orElseGet(() -> new UserEntity(id, ""));
         return findUser(id)
                 .map(user -> new UserInfo(
                         id,
                         user.getUsername(),
                         user.getFirstName(),
                         user.getLastName(),
+                        userEntity.getNickname(),
                         realmMapper.keycloakRolesToGraphQlRoles(user.getRealmRoles())
                 ));
+    }
+
+    public UserInfo setNickname(UUID userId, String nickname) {
+        UserInfo userInfo = findUserInfo(userId).orElseThrow(() ->
+                new EntityNotFoundException("User with the id " + userId +" not found"));
+        UserEntity userEntity = userRepository.findById(userId).orElseGet(() -> new UserEntity(userId, ""));
+        userEntity.setNickname(nickname);
+        userRepository.save(userEntity);
+        userInfo.setNickname(nickname);
+        return userInfo;
     }
 
     private Optional<UserRepresentation> findUser(UUID id) {

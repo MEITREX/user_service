@@ -9,6 +9,8 @@ type Mutation {
     updateSettings(userId: UUID!, input: SettingsInput!): Settings!
 
     defaultSettings(userId: UUID!): Settings!
+
+    setNickname(userId: UUID!, nickname: String!): UserInfo!
 }
 
 input GenerateAccessTokenInput {
