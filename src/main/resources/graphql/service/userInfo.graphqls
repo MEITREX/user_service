@@ -12,6 +12,7 @@ type UserInfo {
     userName: String!
     firstName: String!
     lastName: String!
+    nickname: String!
     realmRoles: [GlobalUserRole!]!
 }
 
