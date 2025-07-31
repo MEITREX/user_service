@@ -41,7 +41,8 @@ public class UserController {
     }
 
     @MutationMapping
-    public UserInfo setNickname(@Argument UUID userId, @Argument String nickname) {
-        return userService.setNickname(userId, nickname);
+    public UserInfo setNickname(@Argument String nickname,
+        @ContextValue LoggedInUser currentUser) {
+        return userService.setNickname(currentUser.getId(), nickname);
     }
 }
