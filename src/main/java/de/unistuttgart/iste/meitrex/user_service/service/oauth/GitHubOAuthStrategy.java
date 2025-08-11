@@ -110,6 +110,7 @@ public class GitHubOAuthStrategy implements ExternalOAuthStrategy {
 
         if (response.statusCode() == 200) {
             return parseTokenResponse(response.body());
+            log.error("Failed to refresh access token. HTTP Status: {} Response: {}", response.statusCode(), response.body());
         }
 
         log.error("Failed to refresh access token. HTTP Status: {} Response: {}", response.statusCode(), response.body());
