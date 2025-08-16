@@ -68,8 +68,11 @@ public class AccessTokenService {
             return true;
         }
 
-        // If access token expired, check if the refresh token is expired
-        return accessToken.getRefreshTokenExpiresAt().isAfter(now);
+        // If access token expired, check if the refresh token is expired and try to refresh it
+        // There's a bug in GH Api that returns 200 error response because it thinks there's a problem with the refresh token, so we check here if the refresh works.
+        // if it does, then refreshAccessToken returns true and a new access token is saved, so getAccessToken can return it (without needing to refresh).
+        // if it doesn't, then returns false and the user will be prompted to re-authorize GitHub. (using generateAccessToken)
+        return accessToken.getRefreshTokenExpiresAt().isAfter(now) && refreshAccessToken(accessToken, provider) != null;
     }
 
     /**
@@ -94,15 +97,18 @@ public class AccessTokenService {
         AccessTokenEntity accessToken = accessTokenOptional.get();
         OffsetDateTime now = OffsetDateTime.now();
 
-        if (accessToken.getAccessTokenExpiresAt() == null || accessToken.getAccessTokenExpiresAt().isAfter(now)) {
+        // commented out because the normal workflow didnt' work, where we had isAccessTokenAvailable check first, then getAccessToken with refresh if needed.
+        // instead we have isAccessTokenAvailable check and refreshAccessToken if needed, and then call getAccessToken that gets us the token.
+        // (check the isAccessTokenAvailable method for more details)
+//        if (accessToken.getAccessTokenExpiresAt() == null || accessToken.getAccessTokenExpiresAt().isAfter(now))
             return new AccessToken(accessToken.getAccessToken(), accessToken.getExternalUserId());
-        }
 
-        if (!accessToken.getRefreshTokenExpiresAt().isAfter(now)) {
-            throw new EntityNotFoundException("Access token expired and refresh token expired for user " + currentUserInfo.getId() + " and provider " + provider);
-        }
 
-        return refreshAccessToken(accessToken, provider);
+//        if (!accessToken.getRefreshTokenExpiresAt().isAfter(now)) {
+//            throw new EntityNotFoundException("Access token expired and refresh token expired for user " + currentUserInfo.getId() + " and provider " + provider);
+//        }
+//
+//        return refreshAccessToken(accessToken, provider);
     }
 
     private AccessToken refreshAccessToken(AccessTokenEntity accessToken, ExternalServiceProvider provider) {

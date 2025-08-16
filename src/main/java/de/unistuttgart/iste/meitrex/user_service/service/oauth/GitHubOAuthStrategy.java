@@ -84,7 +84,9 @@ public class GitHubOAuthStrategy implements ExternalOAuthStrategy {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() == 200) {
+        JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
+
+        if (response.statusCode() == 200 && !json.has("error")) {
             return parseTokenResponse(response.body());
         }
 
@@ -107,6 +109,7 @@ public class GitHubOAuthStrategy implements ExternalOAuthStrategy {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
 
         if (response.statusCode() == 200) {
             log.error("Failed to refresh access token. HTTP Status: {} Response: {}", response.statusCode(), response.body());
