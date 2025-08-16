@@ -44,7 +44,7 @@ public class AccessTokenService {
     private final ExternalOAuthClient externalOAuthClient;
 
     /**
-     * Checks if a valid access token or refresh token is available for a given user and provider.
+     * Checks if a valid access token is available for a given user and provider.
      *
      * @param currentUser the currently logged-in user.
      * @param providerDto the external service provider name.
@@ -69,7 +69,7 @@ public class AccessTokenService {
         }
 
         // If access token expired, check if the refresh token is expired and try to refresh it
-        // There's a bug in GH Api that returns 200 error response because it thinks there's a problem with the refresh token, so we check here if the refresh works.
+        // There's a bug in GH Api that returns 200 error response because it thinks there is a problem with the refresh token (there is not), so we check here if the refresh works.
         // if it does, then refreshAccessToken returns true and a new access token is saved, so getAccessToken can return it (without needing to refresh).
         // if it doesn't, then returns false and the user will be prompted to re-authorize GitHub. (using generateAccessToken)
         return accessToken.getRefreshTokenExpiresAt().isAfter(now) && refreshAccessToken(accessToken, provider) != null;
@@ -97,18 +97,19 @@ public class AccessTokenService {
         AccessTokenEntity accessToken = accessTokenOptional.get();
         OffsetDateTime now = OffsetDateTime.now();
 
-        // commented out because the normal workflow didnt' work, where we had isAccessTokenAvailable check first, then getAccessToken with refresh if needed.
-        // instead we have isAccessTokenAvailable check and refreshAccessToken if needed, and then call getAccessToken that gets us the token.
-        // (check the isAccessTokenAvailable method for more details)
-//        if (accessToken.getAccessTokenExpiresAt() == null || accessToken.getAccessTokenExpiresAt().isAfter(now))
+
+        if (accessToken.getAccessTokenExpiresAt() == null || accessToken.getAccessTokenExpiresAt().isAfter(now)) {
             return new AccessToken(accessToken.getAccessToken(), accessToken.getExternalUserId());
+        }
 
+        // the lines below won't run in current setup, since if we call getAccessToken, we already refreshed the access token if needed in isAccessTokenAvailable.
+        // but if Github resolve their problem, the normal workflow should be used instead, i.e. in isAccessTokenAvailable, we only check if the access token is expired without refreshing.
+        // The refresh will be done below then (check the isAccessTokenAvailable method for more details)
+        if (!accessToken.getRefreshTokenExpiresAt().isAfter(now)) {
+            throw new EntityNotFoundException("Access token expired and refresh token expired for user " + currentUserInfo.getId() + " and provider " + provider);
+        }
 
-//        if (!accessToken.getRefreshTokenExpiresAt().isAfter(now)) {
-//            throw new EntityNotFoundException("Access token expired and refresh token expired for user " + currentUserInfo.getId() + " and provider " + provider);
-//        }
-//
-//        return refreshAccessToken(accessToken, provider);
+        return refreshAccessToken(accessToken, provider);
     }
 
     private AccessToken refreshAccessToken(AccessTokenEntity accessToken, ExternalServiceProvider provider) {

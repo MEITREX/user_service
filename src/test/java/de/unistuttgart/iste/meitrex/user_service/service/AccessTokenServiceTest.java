@@ -27,6 +27,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 
 class AccessTokenServiceTest {
 
@@ -100,12 +101,17 @@ class AccessTokenServiceTest {
     }
 
     @Test
-    void testIsAccessTokenAvailable_ExpiredToken_ValidRefreshToken() {
+    void testIsAccessTokenAvailable_ExpiredToken_ValidRefreshToken() throws Exception{
         validAccessToken.setAccessToken("valid_access_token");
         validAccessToken.setAccessTokenExpiresAt(OffsetDateTime.now().minusMinutes(5));
         validAccessToken.setRefreshToken("refresh_token");
         validAccessToken.setRefreshTokenExpiresAt(OffsetDateTime.now().plusMinutes(5));
         when(accessTokenRepository.findByUserIdAndProvider(any(), any())).thenReturn(Optional.of(validAccessToken));
+
+        AccessTokenResponse refreshed = new AccessTokenResponse(
+                "new_valid_access_token", /* expiresIn */ 3600, "new_refresh", /* refreshExpiresIn */ 7200);
+        when(externalOAuthClient.refreshAccessToken(eq("refresh_token"), any()))
+                .thenReturn(refreshed);
 
         Boolean result = accessTokenService.isAccessTokenAvailable(loggedInUser, providerDto);
 

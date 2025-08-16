@@ -84,14 +84,17 @@ public class GitHubOAuthStrategy implements ExternalOAuthStrategy {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
-
-        if (response.statusCode() == 200 && !json.has("error")) {
-            return parseTokenResponse(response.body());
+        if (response.statusCode() != 200) {
+            log.error("Failed to exchange code. HTTP {} Body: {}", response.statusCode(), response.body());
+            return null;
         }
 
-        log.error("Failed to exchange code for access token. HTTP Status: {} Response: {}", response.statusCode(), response.body());
-        return null;
+        try {
+            return parseTokenResponse(response.body());
+        } catch (Exception ex) {
+            log.error("Non-JSON or malformed token response body: {}", response.body(), ex);
+            return null;
+        }
     }
 
     @Override
@@ -109,17 +112,25 @@ public class GitHubOAuthStrategy implements ExternalOAuthStrategy {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
 
-        if (response.statusCode() == 200) {
-            log.error("Failed to refresh access token. HTTP Status: {} Response: {}", response.statusCode(), response.body());
-            return parseTokenResponse(response.body());
-            
+        if (response.statusCode() != 200) {
+            log.error("Failed to refresh token. HTTP {} Body: {}", response.statusCode(), response.body());
+            return null;
         }
 
-        log.error("Failed to refresh access token. HTTP Status: {} Response: {}", response.statusCode(), response.body());
-        return null;
+        try {
+            JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
+            if (json.has("error")) {
+                log.error("GitHub refresh error: {}", json);
+                return null;
+            }
+            return parseTokenResponse(response.body());
+        } catch (Exception ex) {
+            log.error("Non-JSON or malformed refresh response body: {}", response.body(), ex);
+            return null;
+        }
     }
+
 
     public String fetchExternalUserId(String accessToken) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
