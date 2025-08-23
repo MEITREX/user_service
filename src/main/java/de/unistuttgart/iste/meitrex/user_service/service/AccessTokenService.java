@@ -130,7 +130,7 @@ public class AccessTokenService {
             return new AccessToken(accessToken.getAccessToken(), accessToken.getExternalUserId());
         } catch (IOException | InterruptedException e) {
             if (e instanceof InterruptedException) Thread.currentThread().interrupt();
-            log.error("Failed to refresh access token for user {} and provider {}", accessToken.getUserId(), provider, e);
+            log.error("Failed to refresh access token for user {} and provider {}", accessToken.getUserId(), provider);
         }
         return null;
     }
@@ -168,7 +168,7 @@ public class AccessTokenService {
             }
         } catch (IOException | InterruptedException e) {
             if (e instanceof InterruptedException) Thread.currentThread().interrupt();
-            log.error("Failed to generate access token for user {} and provider {}", currentUserInfo.getId(), provider, e);
+            log.error("Failed to generate access token for user {} and provider {}", currentUserInfo.getId(), provider);
         }
         return false;
     }

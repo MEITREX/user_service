@@ -92,7 +92,7 @@ public class GitHubOAuthStrategy implements ExternalOAuthStrategy {
         try {
             return parseTokenResponse(response.body());
         } catch (Exception ex) {
-            log.error("Non-JSON or malformed token response body: {}", response.body(), ex);
+            log.error("Non-JSON or malformed token response body: {}", response.body());
             return null;
         }
     }
@@ -126,7 +126,7 @@ public class GitHubOAuthStrategy implements ExternalOAuthStrategy {
             }
             return parseTokenResponse(response.body());
         } catch (Exception ex) {
-            log.error("Non-JSON or malformed refresh response body: {}", response.body(), ex);
+            log.error("Non-JSON or malformed refresh response body: {}", response.body());
             return null;
         }
     }
