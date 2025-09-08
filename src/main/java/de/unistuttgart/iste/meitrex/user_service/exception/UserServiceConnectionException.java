@@ -40,8 +40,12 @@ public class UserServiceConnectionException extends Exception {
      * Unwraps a RuntimeException thrown by reactive pipelines and rethrows as UserServiceConnectionException when possible.
      */
     public static void unwrapAndThrow(final RuntimeException e) throws UserServiceConnectionException {
-        if (e.getCause() instanceof final UserServiceConnectionException ue) {
-            throw ue;
+        Throwable t = e;
+        while (t != null) {
+            if (t instanceof UserServiceConnectionException uce) {
+                throw uce;
+            }
+            t = t.getCause();
         }
         throw e;
     }

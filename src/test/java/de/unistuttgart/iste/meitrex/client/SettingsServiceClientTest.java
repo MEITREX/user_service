@@ -223,4 +223,39 @@ class SettingsServiceClientTest {
         return HttpGraphQlClient.builder(webClient).build();
     }
 
+    private static GraphQlClient gqlErrorWrapped(String message) {
+        ExchangeFunction fx = req -> {
+            return Mono.error(new RuntimeException(
+                    new UserServiceConnectionException(message)
+            ));
+        };
+        WebClient webClient = WebClient.builder().exchangeFunction(fx).build();
+        return HttpGraphQlClient.builder(webClient).build();
+    }
+
+    @Test
+    void queryUserSettings_runtimeWrapped_unwrapsToUserServiceConnectionException() {
+        SettingsServiceClient client = new SettingsServiceClient(gqlErrorWrapped("wrapped-error"));
+        assertThrows(UserServiceConnectionException.class,
+                () -> client.queryUserSettings(UUID.randomUUID()));
+    }
+
+    @Test
+    void queryUsersSettings_runtimeWrapped_unwrapsToUserServiceConnectionException() {
+        SettingsServiceClient client = new SettingsServiceClient(gqlErrorWrapped("wrapped-error"));
+        assertThrows(UserServiceConnectionException.class,
+                () -> client.queryUsersSettings(List.of(UUID.randomUUID())));
+    }
+
+    @Test
+    void queryUsersSettings_nullList_normalizedToEmpty() throws UserServiceConnectionException {
+        String json = """
+        { "data": { "findUsersSettings": null } }
+    """;
+        SettingsServiceClient client = new SettingsServiceClient(gqlWithJson(json));
+
+        List<Settings> list = client.queryUsersSettings(List.of(UUID.randomUUID()));
+        org.junit.jupiter.api.Assertions.assertNotNull(list);
+        org.junit.jupiter.api.Assertions.assertTrue(list.isEmpty());
+    }
 }
