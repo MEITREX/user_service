@@ -1,4 +1,4 @@
-﻿package de.unistuttgart.iste.meitrex.user_service.client;
+package de.unistuttgart.iste.meitrex.user_service.client;
 
 import de.unistuttgart.iste.meitrex.generated.dto.Settings;
 import de.unistuttgart.iste.meitrex.user_service.exception.UserServiceConnectionException;

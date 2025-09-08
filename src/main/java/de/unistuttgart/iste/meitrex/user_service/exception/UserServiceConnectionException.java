@@ -1,4 +1,4 @@
-﻿package de.unistuttgart.iste.meitrex.user_service.exception;
+package de.unistuttgart.iste.meitrex.user_service.exception;
 
 import org.springframework.graphql.ResponseError;
 

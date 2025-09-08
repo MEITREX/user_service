@@ -1,4 +1,4 @@
-﻿package de.unistuttgart.iste.meitrex.user_service.client;
+package de.unistuttgart.iste.meitrex.user_service.client;
 
 import lombok.NoArgsConstructor;
 
