@@ -4,8 +4,15 @@ import de.unistuttgart.iste.meitrex.generated.dto.Gamification;
 import de.unistuttgart.iste.meitrex.generated.dto.Settings;
 import de.unistuttgart.iste.meitrex.user_service.client.SettingsServiceClient;
 import de.unistuttgart.iste.meitrex.user_service.exception.UserServiceConnectionException;
+import graphql.ErrorType;
 import org.junit.jupiter.api.Test;
-import org.springframework.graphql.client.FieldAccessException;
+import org.springframework.graphql.ResponseError;
+
+import java.lang.reflect.Proxy;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 import org.springframework.graphql.client.GraphQlClient;
 import org.springframework.graphql.client.HttpGraphQlClient;
 import org.springframework.http.HttpStatus;
@@ -14,7 +21,6 @@ import org.springframework.web.reactive.function.client.ExchangeFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -257,5 +263,77 @@ class SettingsServiceClientTest {
         List<Settings> list = client.queryUsersSettings(List.of(UUID.randomUUID()));
         org.junit.jupiter.api.Assertions.assertNotNull(list);
         org.junit.jupiter.api.Assertions.assertTrue(list.isEmpty());
+    }
+
+    private static ResponseError responseError(String message) {
+        return (ResponseError) Proxy.newProxyInstance(
+                ResponseError.class.getClassLoader(),
+                new Class[]{ResponseError.class},
+                (proxy, method, args) -> {
+                    String name = method.getName();
+                    if ("getMessage".equals(name)) {
+                        return message;
+                    }
+                    if ("toSpecification".equals(name)) {
+                        return Map.of("message", message);
+                    }
+                    return null;
+                }
+        );
+    }
+
+
+    @Test
+    void constructor_withMessage_keepsMessage() {
+        var ex = new UserServiceConnectionException("plain");
+        assertEquals("plain", ex.getMessage());
+    }
+
+    @Test
+    void constructor_withErrors_formatsMessage() {
+        var base = "Invalid response";
+        var ex = new UserServiceConnectionException(base, java.util.List.of(
+                responseError("boom1"),
+                responseError("boom2")
+        ));
+
+        String msg = ex.getMessage();
+        assertTrue(msg.contains(base));
+        assertTrue(msg.contains("boom1"));
+        assertTrue(msg.contains("boom2"));
+    }
+
+    @Test
+    void constructor_withNullErrors_fallsBackToBaseMessage() {
+        var ex = new UserServiceConnectionException("only-base", null);
+        assertEquals("only-base", ex.getMessage());
+    }
+
+    @Test
+    void unwrapAndThrow_directWrapped_throwsInnerUserEx() {
+        var inner = new UserServiceConnectionException("inner");
+        var outer = new RuntimeException(inner);
+
+        var thrown = assertThrows(UserServiceConnectionException.class,
+                () -> UserServiceConnectionException.unwrapAndThrow(outer));
+        assertEquals("inner", thrown.getMessage());
+    }
+
+    @Test
+    void unwrapAndThrow_deeplyNested_throwsInnerUserEx() {
+        var inner = new UserServiceConnectionException("deep");
+        var outer = new RuntimeException(new IllegalStateException(inner));
+
+        var thrown = assertThrows(UserServiceConnectionException.class,
+                () -> UserServiceConnectionException.unwrapAndThrow(outer));
+        assertEquals("deep", thrown.getMessage());
+    }
+
+    @Test
+    void unwrapAndThrow_noUserEx_rethrowsOriginalRuntime() {
+        var outer = new RuntimeException(new IllegalArgumentException("no-user-ex"));
+        var rethrown = assertThrows(RuntimeException.class,
+                () -> UserServiceConnectionException.unwrapAndThrow(outer));
+        assertSame(outer, rethrown);
     }
 }
