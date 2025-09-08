@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -111,6 +112,62 @@ class SettingsServiceClientTest {
                 () -> client.queryUserSettings(UUID.randomUUID()));
     }
 
+    @Test
+    void queryUserSettings_fieldMissing_throws() {
+        String json = "{ \"data\": { } }";
+        SettingsServiceClient client = new SettingsServiceClient(gqlWithJson(json));
+
+        assertThrows(UserServiceConnectionException.class,
+                () -> client.queryUserSettings(UUID.randomUUID()));
+    }
+
+
+    @Test
+    void queryUserSettings_retriesThenSuccess() throws Exception {
+        String err = "{ \"data\": { \"findUserSettings\": null }, \"errors\": [ { \"message\": \"e\" } ] }";
+        String ok = """
+        { "data": { "findUserSettings": {
+            "gamification": "ALL_GAMIFICATION_DISABLED",
+            "notification": { "gamification": false, "lecture": true }
+        } } }
+    """;
+        SettingsServiceClient client = new SettingsServiceClient(gqlWithSequence(err, err, ok));
+
+        Settings s = client.queryUserSettings(UUID.randomUUID());
+
+        assertNotNull(s);
+        assertEquals(Gamification.ALL_GAMIFICATION_DISABLED, s.getGamification());
+        assertEquals(Boolean.FALSE, s.getNotification().getGamification());
+        assertEquals(Boolean.TRUE, s.getNotification().getLecture());
+    }
+
+    @Test
+    void queryUsersSettings_emptyInput_noHttpCall() {
+        AtomicInteger calls = new AtomicInteger(0);
+        SettingsServiceClient client = new SettingsServiceClient(gqlCounting(calls));
+
+        try {
+            List<Settings> list = client.queryUsersSettings(List.of());
+            assertNotNull(list);
+            assertTrue(list.isEmpty());
+            assertEquals(0, calls.get(), "No HTTP call should be made for empty input");
+        } catch (UserServiceConnectionException e) {
+            fail("Unexpected exception: " + e.getMessage());
+        }
+    }
+
+
+
+    @Test
+    void queryUsersSettings_mappingError_throws() {
+        String json = "{ \"data\": { \"findUsersSettings\": { \"not\": \"a list\" } } }";
+        SettingsServiceClient client = new SettingsServiceClient(gqlWithJson(json));
+
+        assertThrows(UserServiceConnectionException.class,
+                () -> client.queryUsersSettings(List.of(UUID.randomUUID())));
+    }
+
+
     /**
      * Creates a GraphQlClient backed by a WebClient that always returns the given JSON.
      * No server, no extra deps.
@@ -129,4 +186,41 @@ class SettingsServiceClientTest {
                 .build();
         return HttpGraphQlClient.builder(webClient).build();
     }
+
+    private static GraphQlClient gqlWithJson(String json) {
+        ExchangeFunction fx = req -> Mono.just(
+                ClientResponse.create(HttpStatus.OK)
+                        .header("Content-Type", "application/json")
+                        .body(json)
+                        .build()
+        );
+        WebClient webClient = WebClient.builder().exchangeFunction(fx).build();
+        return HttpGraphQlClient.builder(webClient).build();
+    }
+
+    private static GraphQlClient gqlWithSequence(String... jsonResponses) {
+        AtomicInteger idx = new AtomicInteger(0);
+        ExchangeFunction fx = req -> {
+            String body = jsonResponses[Math.min(idx.getAndIncrement(), jsonResponses.length - 1)];
+            return Mono.just(ClientResponse.create(HttpStatus.OK)
+                    .header("Content-Type", "application/json")
+                    .body(body)
+                    .build());
+        };
+        WebClient webClient = WebClient.builder().exchangeFunction(fx).build();
+        return HttpGraphQlClient.builder(webClient).build();
+    }
+
+    private static GraphQlClient gqlCounting(AtomicInteger counter) {
+        ExchangeFunction fx = req -> {
+            counter.incrementAndGet();
+            return Mono.just(ClientResponse.create(HttpStatus.OK)
+                    .header("Content-Type", "application/json")
+                    .body("{ \"data\": { \"findUsersSettings\": [] } }")
+                    .build());
+        };
+        WebClient webClient = WebClient.builder().exchangeFunction(fx).build();
+        return HttpGraphQlClient.builder(webClient).build();
+    }
+
 }
