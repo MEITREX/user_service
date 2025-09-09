@@ -3,8 +3,7 @@ package de.unistuttgart.iste.meitrex.client;
 import de.unistuttgart.iste.meitrex.generated.dto.Gamification;
 import de.unistuttgart.iste.meitrex.generated.dto.Settings;
 import de.unistuttgart.iste.meitrex.user_service.client.SettingsServiceClient;
-import de.unistuttgart.iste.meitrex.user_service.exception.UserServiceConnectionException;
-import graphql.ErrorType;
+import de.unistuttgart.iste.meitrex.user_service.exception.SettingServiceConnectionException;
 import org.junit.jupiter.api.Test;
 import org.springframework.graphql.ResponseError;
 
@@ -23,8 +22,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for SettingsServiceClient
@@ -114,7 +111,7 @@ class SettingsServiceClientTest {
 
         SettingsServiceClient client = new SettingsServiceClient(gql);
 
-        assertThrows(UserServiceConnectionException.class,
+        assertThrows(SettingServiceConnectionException.class,
                 () -> client.queryUserSettings(UUID.randomUUID()));
     }
 
@@ -123,7 +120,7 @@ class SettingsServiceClientTest {
         String json = "{ \"data\": { } }";
         SettingsServiceClient client = new SettingsServiceClient(gqlWithJson(json));
 
-        assertThrows(UserServiceConnectionException.class,
+        assertThrows(SettingServiceConnectionException.class,
                 () -> client.queryUserSettings(UUID.randomUUID()));
     }
 
@@ -157,7 +154,7 @@ class SettingsServiceClientTest {
             assertNotNull(list);
             assertTrue(list.isEmpty());
             assertEquals(0, calls.get(), "No HTTP call should be made for empty input");
-        } catch (UserServiceConnectionException e) {
+        } catch (SettingServiceConnectionException e) {
             fail("Unexpected exception: " + e.getMessage());
         }
     }
@@ -169,7 +166,7 @@ class SettingsServiceClientTest {
         String json = "{ \"data\": { \"findUsersSettings\": { \"not\": \"a list\" } } }";
         SettingsServiceClient client = new SettingsServiceClient(gqlWithJson(json));
 
-        assertThrows(UserServiceConnectionException.class,
+        assertThrows(SettingServiceConnectionException.class,
                 () -> client.queryUsersSettings(List.of(UUID.randomUUID())));
     }
 
@@ -232,7 +229,7 @@ class SettingsServiceClientTest {
     private static GraphQlClient gqlErrorWrapped(String message) {
         ExchangeFunction fx = req -> {
             return Mono.error(new RuntimeException(
-                    new UserServiceConnectionException(message)
+                    new SettingServiceConnectionException(message)
             ));
         };
         WebClient webClient = WebClient.builder().exchangeFunction(fx).build();
@@ -242,19 +239,19 @@ class SettingsServiceClientTest {
     @Test
     void queryUserSettings_runtimeWrapped_unwrapsToUserServiceConnectionException() {
         SettingsServiceClient client = new SettingsServiceClient(gqlErrorWrapped("wrapped-error"));
-        assertThrows(UserServiceConnectionException.class,
+        assertThrows(SettingServiceConnectionException.class,
                 () -> client.queryUserSettings(UUID.randomUUID()));
     }
 
     @Test
     void queryUsersSettings_runtimeWrapped_unwrapsToUserServiceConnectionException() {
         SettingsServiceClient client = new SettingsServiceClient(gqlErrorWrapped("wrapped-error"));
-        assertThrows(UserServiceConnectionException.class,
+        assertThrows(SettingServiceConnectionException.class,
                 () -> client.queryUsersSettings(List.of(UUID.randomUUID())));
     }
 
     @Test
-    void queryUsersSettings_nullList_normalizedToEmpty() throws UserServiceConnectionException {
+    void queryUsersSettings_nullList_normalizedToEmpty() throws SettingServiceConnectionException {
         String json = """
         { "data": { "findUsersSettings": null } }
     """;
@@ -285,14 +282,14 @@ class SettingsServiceClientTest {
 
     @Test
     void constructor_withMessage_keepsMessage() {
-        var ex = new UserServiceConnectionException("plain");
+        var ex = new SettingServiceConnectionException("plain");
         assertEquals("plain", ex.getMessage());
     }
 
     @Test
     void constructor_withErrors_formatsMessage() {
         var base = "Invalid response";
-        var ex = new UserServiceConnectionException(base, java.util.List.of(
+        var ex = new SettingServiceConnectionException(base, java.util.List.of(
                 responseError("boom1"),
                 responseError("boom2")
         ));
@@ -305,27 +302,27 @@ class SettingsServiceClientTest {
 
     @Test
     void constructor_withNullErrors_fallsBackToBaseMessage() {
-        var ex = new UserServiceConnectionException("only-base", null);
+        var ex = new SettingServiceConnectionException("only-base", null);
         assertEquals("only-base", ex.getMessage());
     }
 
     @Test
     void unwrapAndThrow_directWrapped_throwsInnerUserEx() {
-        var inner = new UserServiceConnectionException("inner");
+        var inner = new SettingServiceConnectionException("inner");
         var outer = new RuntimeException(inner);
 
-        var thrown = assertThrows(UserServiceConnectionException.class,
-                () -> UserServiceConnectionException.unwrapAndThrow(outer));
+        var thrown = assertThrows(SettingServiceConnectionException.class,
+                () -> SettingServiceConnectionException.unwrapAndThrow(outer));
         assertEquals("inner", thrown.getMessage());
     }
 
     @Test
     void unwrapAndThrow_deeplyNested_throwsInnerUserEx() {
-        var inner = new UserServiceConnectionException("deep");
+        var inner = new SettingServiceConnectionException("deep");
         var outer = new RuntimeException(new IllegalStateException(inner));
 
-        var thrown = assertThrows(UserServiceConnectionException.class,
-                () -> UserServiceConnectionException.unwrapAndThrow(outer));
+        var thrown = assertThrows(SettingServiceConnectionException.class,
+                () -> SettingServiceConnectionException.unwrapAndThrow(outer));
         assertEquals("deep", thrown.getMessage());
     }
 
@@ -333,7 +330,7 @@ class SettingsServiceClientTest {
     void unwrapAndThrow_noUserEx_rethrowsOriginalRuntime() {
         var outer = new RuntimeException(new IllegalArgumentException("no-user-ex"));
         var rethrown = assertThrows(RuntimeException.class,
-                () -> UserServiceConnectionException.unwrapAndThrow(outer));
+                () -> SettingServiceConnectionException.unwrapAndThrow(outer));
         assertSame(outer, rethrown);
     }
 }

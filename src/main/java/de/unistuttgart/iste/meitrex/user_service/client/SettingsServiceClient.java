@@ -1,7 +1,7 @@
 package de.unistuttgart.iste.meitrex.user_service.client;
 
 import de.unistuttgart.iste.meitrex.generated.dto.Settings;
-import de.unistuttgart.iste.meitrex.user_service.exception.UserServiceConnectionException;
+import de.unistuttgart.iste.meitrex.user_service.exception.SettingServiceConnectionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.client.ClientGraphQlResponse;
 import org.springframework.graphql.client.GraphQlClient;
@@ -28,16 +28,16 @@ public class SettingsServiceClient {
      *
      * @param userId the user id
      * @return settings of the user (never null on success)
-     * @throws UserServiceConnectionException if the response has GraphQL errors, the field is missing/null, or mapping fails
+     * @throws SettingServiceConnectionException if the response has GraphQL errors, the field is missing/null, or mapping fails
      */
-    public Settings queryUserSettings(final UUID userId) throws UserServiceConnectionException {
+    public Settings queryUserSettings(final UUID userId) throws SettingServiceConnectionException {
         try {
             return graphQlClient.document(QueryDefinitions.FIND_USER_SETTINGS_QUERY)
                     .variable("userId", userId)
                     .execute()
                     .handle((ClientGraphQlResponse result, SynchronousSink<Settings> sink) -> {
                         if (!result.isValid()) {
-                            sink.error(new UserServiceConnectionException(
+                            sink.error(new SettingServiceConnectionException(
                                     "Invalid response from user-service (findUserSettings).",
                                     result.getErrors()));
                             return;
@@ -47,14 +47,14 @@ public class SettingsServiceClient {
                                     .field(QueryDefinitions.FIND_USER_SETTINGS_QUERY_NAME)
                                     .toEntity(Settings.class);
                             if (s == null) {
-                                sink.error(new UserServiceConnectionException(
+                                sink.error(new SettingServiceConnectionException(
                                         "Missing field 'findUserSettings' in user-service response."));
                                 return;
                             }
                             sink.next(s);
                             sink.complete();
                         } catch (Exception mappingEx) {
-                            sink.error(new UserServiceConnectionException(
+                            sink.error(new SettingServiceConnectionException(
                                     "Failed to map 'findUserSettings' from user-service response: "
                                             + mappingEx.getMessage()));
                         }
@@ -62,7 +62,7 @@ public class SettingsServiceClient {
                     .retry(RETRY_COUNT)
                     .block();
         } catch (final RuntimeException e) {
-            UserServiceConnectionException.unwrapAndThrow(e);
+            SettingServiceConnectionException.unwrapAndThrow(e);
             return null;
         }
     }
@@ -72,9 +72,9 @@ public class SettingsServiceClient {
      *
      * @param userIds list of user ids
      * @return list of settings (never null; may be empty)
-     * @throws UserServiceConnectionException if the response has GraphQL errors or mapping fails
+     * @throws SettingServiceConnectionException if the response has GraphQL errors or mapping fails
      */
-    public List<Settings> queryUsersSettings(final List<UUID> userIds) throws UserServiceConnectionException {
+    public List<Settings> queryUsersSettings(final List<UUID> userIds) throws SettingServiceConnectionException {
         if (userIds == null || userIds.isEmpty()) {
             return List.of();
         }
@@ -84,7 +84,7 @@ public class SettingsServiceClient {
                     .execute()
                     .handle((ClientGraphQlResponse result, SynchronousSink<List<Settings>> sink) -> {
                         if (!result.isValid()) {
-                            sink.error(new UserServiceConnectionException(
+                            sink.error(new SettingServiceConnectionException(
                                     "Invalid response from user-service (findUsersSettings).",
                                     result.getErrors()));
                             return;
@@ -96,7 +96,7 @@ public class SettingsServiceClient {
                             sink.next(list != null ? list : List.of());
                             sink.complete();
                         } catch (Exception mappingEx) {
-                            sink.error(new UserServiceConnectionException(
+                            sink.error(new SettingServiceConnectionException(
                                     "Failed to map 'findUsersSettings' from user-service response: "
                                             + mappingEx.getMessage()));
                         }
@@ -104,7 +104,7 @@ public class SettingsServiceClient {
                     .retry(RETRY_COUNT)
                     .block();
         } catch (final RuntimeException e) {
-            UserServiceConnectionException.unwrapAndThrow(e);
+            SettingServiceConnectionException.unwrapAndThrow(e);
             return List.of(); // unreachable
         }
     }

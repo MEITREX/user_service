@@ -7,16 +7,16 @@ import java.util.List;
 /**
  * Exception thrown when the connection to the user-service fails or returns an invalid response.
  */
-public class UserServiceConnectionException extends Exception {
+public class SettingServiceConnectionException extends Exception {
 
     private final String message;
 
-    public UserServiceConnectionException(final String message) {
+    public SettingServiceConnectionException(final String message) {
         super(message);
         this.message = message;
     }
 
-    public UserServiceConnectionException(final String message, final List<ResponseError> errors) {
+    public SettingServiceConnectionException(final String message, final List<ResponseError> errors) {
         super(withErrors(message, errors));
         this.message = withErrors(message, errors);
     }
@@ -39,10 +39,10 @@ public class UserServiceConnectionException extends Exception {
     /**
      * Unwraps a RuntimeException thrown by reactive pipelines and rethrows as UserServiceConnectionException when possible.
      */
-    public static void unwrapAndThrow(final RuntimeException e) throws UserServiceConnectionException {
+    public static void unwrapAndThrow(final RuntimeException e) throws SettingServiceConnectionException {
         Throwable t = e;
         while (t != null) {
-            if (t instanceof UserServiceConnectionException uce) {
+            if (t instanceof SettingServiceConnectionException uce) {
                 throw uce;
             }
             t = t.getCause();
