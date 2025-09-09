@@ -6,6 +6,8 @@
   * [Query](#query)
   * [Mutation](#mutation)
   * [Objects](#objects)
+    * [AccessToken](#accesstoken)
+    * [ExternalUserIdWithUser](#externaluseridwithuser)
     * [Notification](#notification)
     * [PaginationInfo](#paginationinfo)
     * [PublicUserInfo](#publicuserinfo)
@@ -13,12 +15,14 @@
     * [UserInfo](#userinfo)
   * [Inputs](#inputs)
     * [DateTimeFilter](#datetimefilter)
+    * [GenerateAccessTokenInput](#generateaccesstokeninput)
     * [IntFilter](#intfilter)
     * [NotificationInput](#notificationinput)
     * [Pagination](#pagination)
     * [SettingsInput](#settingsinput)
     * [StringFilter](#stringfilter)
   * [Enums](#enums)
+    * [ExternalServiceProviderDto](#externalserviceproviderdto)
     * [Gamification](#gamification)
     * [GlobalUserRole](#globaluserrole)
     * [SortDirection](#sortdirection)
@@ -87,6 +91,69 @@ If a user does not exist, null is returned for that user.
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong id="query.isaccesstokenavailable">isAccessTokenAvailable</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+Checks whether an access token for a given third-party provider exists and is still valid for the currently authenticated user.
+Returns `true` if:
+- The access token exists and is not expired, OR
+- The refresh token exists and is not expired.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">provider</td>
+<td valign="top"><a href="#externalserviceproviderdto">ExternalServiceProviderDto</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="query._internal_noauth_getaccesstoken">_internal_noauth_getAccessToken</strong></td>
+<td valign="top"><a href="#accesstoken">AccessToken</a>!</td>
+<td>
+
+Retrieves the access token of the specified user for a specified third-party provider.
+
+- If the access token is expired but a valid refresh token is available, the system will attempt to generate a new access token.
+- Throws an exception if neither a valid access token nor a valid refresh token is available.
+
+⚠️ This query is **only accessible internally**. ⚠️
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">userId</td>
+<td valign="top"><a href="#uuid">UUID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">provider</td>
+<td valign="top"><a href="#externalserviceproviderdto">ExternalServiceProviderDto</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="query._internal_noauth_getexternaluserids">_internal_noauth_getExternalUserIds</strong></td>
+<td valign="top">[<a href="#externaluseridwithuser">ExternalUserIdWithUser</a>!]!</td>
+<td>
+
+Retrieves the external user IDs for a list of users with the specified IDs.
+If a user does not exist, null is returned for that user.
+If the user does not have an external user ID for the specified provider, null is returned for that user.
+⚠️ This query is **only accessible internally** and the caller must be at least a tutor of a course. The permission must be validated by the caller method. ⚠️
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">userIds</td>
+<td valign="top">[<a href="#uuid">UUID</a>!]!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">provider</td>
+<td valign="top"><a href="#externalserviceproviderdto">ExternalServiceProviderDto</a></td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong id="query.findusersettings">findUserSettings</strong></td>
 <td valign="top"><a href="#settings">Settings</a>!</td>
 <td></td>
@@ -121,6 +188,22 @@ If a user does not exist, null is returned for that user.
 </thead>
 <tbody>
 <tr>
+<td colspan="2" valign="top"><strong id="mutation.generateaccesstoken">generateAccessToken</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+Generates an access token for the given provider using an authorization code obtained from the OAuth flow.
+This should be called **only after** the user completes authorization and the frontend retrieves the auth code.
+After the access token is generated, the user is redirected to the redirect URI.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#generateaccesstokeninput">GenerateAccessTokenInput</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong id="mutation.updatesettings">updateSettings</strong></td>
 <td valign="top"><a href="#settings">Settings</a>!</td>
 <td></td>
@@ -149,6 +232,56 @@ If a user does not exist, null is returned for that user.
 </table>
 
 ## Objects
+
+### AccessToken
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong id="accesstoken.accesstoken">accessToken</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="accesstoken.externaluserid">externalUserId</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### ExternalUserIdWithUser
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong id="externaluseridwithuser.userid">userId</strong></td>
+<td valign="top"><a href="#uuid">UUID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="externaluseridwithuser.externaluserid">externalUserId</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
 
 ### Notification
 
@@ -364,6 +497,30 @@ If specified, filters for dates before the specified value.
 </tbody>
 </table>
 
+### GenerateAccessTokenInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong id="generateaccesstokeninput.provider">provider</strong></td>
+<td valign="top"><a href="#externalserviceproviderdto">ExternalServiceProviderDto</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong id="generateaccesstokeninput.authorizationcode">authorizationCode</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### IntFilter
 
 Filter for integer values.
@@ -538,6 +695,23 @@ If true, the filter is case-insensitive.
 </table>
 
 ## Enums
+
+### ExternalServiceProviderDto
+
+<table>
+<thead>
+<tr>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>GITHUB</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 
 ### Gamification
 

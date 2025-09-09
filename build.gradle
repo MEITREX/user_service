@@ -57,6 +57,7 @@ graphqlCodegen {
 	packageName = "de.unistuttgart.iste.meitrex.generated.dto"
 	generatedAnnotation = "jakarta.annotation.Generated"
 	modelValidationAnnotation = "jakarta.validation.constraints.NotNull"
+    generateJacksonTypeIdResolver = true // allows graphql .toEntity() conversion with Jackson for interfaces and unions
 	generateApis = false // set to false as the generator does not support spring boot graphQL
 	customTypesMapping = [
 			"DateTime" : "java.time.OffsetDateTime",
@@ -126,14 +127,14 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'de.unistuttgart.iste.meitrex:meitrex-common-test:1.2.6'
+	testImplementation 'de.unistuttgart.iste.meitrex:meitrex-common-test:1.4.6'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework:spring-webflux'
 	testImplementation 'org.springframework.graphql:spring-graphql-test'
 	testImplementation "org.mockito:mockito-core:5.+"
 	testImplementation 'org.hamcrest:hamcrest:2.+'
 	testImplementation "org.testcontainers:postgresql:1.+"
-	testImplementation "org.testcontainers:junit-jupiter:1.18.3"
+	testImplementation "org.testcontainers:junit-jupiter:1.+"
 }
 
 tasks.named('test') {

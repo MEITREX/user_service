@@ -23,8 +23,3 @@ type Settings {
     gamification: Gamification,
     notification: Notification,
 }
-
-type Mutation {
-    updateSettings(userId: UUID!, input: SettingsInput!): Settings!
-    defaultSettings(userId: UUID!): Settings!
-}

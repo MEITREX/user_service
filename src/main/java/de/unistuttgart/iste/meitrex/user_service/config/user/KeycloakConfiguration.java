@@ -1,4 +1,4 @@
-package de.unistuttgart.iste.meitrex.user_service.config;
+package de.unistuttgart.iste.meitrex.user_service.config.user;
 
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
