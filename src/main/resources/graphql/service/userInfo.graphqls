@@ -1,6 +1,7 @@
 type PublicUserInfo {
     id: UUID!
     userName: String!
+    nickname: String!
 }
 enum GlobalUserRole {
     SUPER_USER,

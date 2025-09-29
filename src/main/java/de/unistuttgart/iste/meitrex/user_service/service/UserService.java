@@ -48,7 +48,8 @@ public class UserService {
      * @return an optional of the public user info or empty if the user could not be retrieved.
      */
     public Optional<PublicUserInfo> findPublicUserInfo(UUID id) {
-        return findUser(id).map(user -> new PublicUserInfo(id, user.getUsername()));
+        String nickname = userRepository.findById(id).map(UserEntity::getNickname).orElse("");
+        return findUser(id).map(user -> new PublicUserInfo(id, user.getUsername(), nickname));
     }
 
     /**
